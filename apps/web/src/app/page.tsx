@@ -16,26 +16,25 @@ export default function Home() {
               </span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="/features" className="text-slate-600 hover:text-slate-900">
-                Features
+              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">
+                Dashboard
               </Link>
-              <Link href="/pricing" className="text-slate-600 hover:text-slate-900">
-                Pricing
+              <Link href="/ask" className="text-slate-600 hover:text-slate-900">
+                Ask AI
               </Link>
-              <Link href="/docs" className="text-slate-600 hover:text-slate-900">
-                Docs
-              </Link>
-              <Link
-                href="/login"
+              <a
+                href="https://github.com/MARUCIE/data-wings"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-slate-600 hover:text-slate-900"
               >
-                Log in
-              </Link>
+                GitHub
+              </a>
               <Link
-                href="/signup"
+                href="/ask"
                 className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
               >
-                Get Started
+                Try AI Query
               </Link>
             </nav>
           </div>
@@ -56,16 +55,16 @@ export default function Home() {
           </p>
           <div className="mt-10 flex justify-center gap-4">
             <Link
-              href="/signup"
-              className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors"
+              href="/ask"
+              className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/25"
             >
-              Start Free
+              Try AI Query
             </Link>
             <Link
-              href="/demo"
+              href="/dashboard"
               className="bg-white text-slate-900 px-8 py-3 rounded-lg text-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors"
             >
-              Live Demo
+              View Dashboard
             </Link>
           </div>
         </div>

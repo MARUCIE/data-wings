@@ -136,11 +136,27 @@
   - [x] Create GitHub Release
   - [x] Push Docker images to GHCR
 
+### Phase 8: MVP 功能开发（Core Features） - [x] 完成
+
+- [x] 8.1 后端 API 完善
+  - [x] 配置管理（config package）
+  - [x] 数据模型（models package）
+  - [x] ClickHouse 仓库层（repository package）
+  - [x] 事件处理器（events handler）
+  - [x] 分析处理器（analytics handler）
+  - [x] 仪表盘处理器（dashboard handler）
+  - [x] 优雅关闭与信号处理
+- [x] 8.2 前端仪表盘
+  - [x] API Client（api.ts）
+  - [x] Dashboard 页面（指标卡片 + 折线图 + 柱状图）
+  - [x] Ask 页面（NL 查询界面）
+  - [x] 首页导航更新
+
 ---
 
 ## 当前进度
 
-**Phase**: 7 - CI/CD 配置（已完成）
+**Phase**: 8 - MVP 功能开发（已完成）
 **Status**: 已完成
 **Last Updated**: 2025-01-28
 
@@ -208,11 +224,12 @@
 4. ~~**项目脚手架** - 初始化前后端项目结构~~ [x] 完成
 5. ~~**SDK 开发** - JavaScript/TypeScript SDK~~ [x] 完成
 6. ~~**CI/CD 配置** - GitHub Actions 自动化构建与发布~~ [x] 完成
-7. **本地开发环境** - `docker compose up -d` 启动完整开发栈
-8. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
-9. **端到端测试** - 验证 NL2SQL 真实调用
-10. **设计稿** - 基于 UX Map 开始 Figma 设计
-11. **MVP 功能开发** - 事件追踪 + NL 查询 + 基础仪表盘
+7. ~~**MVP 功能开发** - 事件追踪 + NL 查询 + 基础仪表盘~~ [x] 完成
+8. **本地开发环境** - `docker compose up -d` 启动完整开发栈
+9. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
+10. **端到端测试** - 验证 NL2SQL 真实调用
+11. **设计稿** - 基于 UX Map 开始 Figma 设计
+12. **用户测试** - 收集真实用户反馈并迭代
 
 ---
 
