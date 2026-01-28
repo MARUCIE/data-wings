@@ -123,11 +123,24 @@
 - [x] 6.5 测试
   - [x] 单元测试（Vitest）
 
+### Phase 7: CI/CD 配置（Automation） - [x] 完成
+
+- [x] 7.1 GitHub Actions CI
+  - [x] Lint & Type Check
+  - [x] Test (Node.js / Go / Python)
+  - [x] Build packages
+  - [x] Build Docker images
+- [x] 7.2 GitHub Actions Release
+  - [x] Publish SDK to npm
+  - [x] Generate Changelog (git-cliff)
+  - [x] Create GitHub Release
+  - [x] Push Docker images to GHCR
+
 ---
 
 ## 当前进度
 
-**Phase**: 6 - SDK 开发（已完成）
+**Phase**: 7 - CI/CD 配置（已完成）
 **Status**: 已完成
 **Last Updated**: 2025-01-28
 
@@ -194,11 +207,12 @@
 3. ~~**技术 Spike** - 验证 NL2SQL 技术可行性~~ [x] 完成
 4. ~~**项目脚手架** - 初始化前后端项目结构~~ [x] 完成
 5. ~~**SDK 开发** - JavaScript/TypeScript SDK~~ [x] 完成
-6. **本地开发环境** - `docker compose up -d` 启动完整开发栈
-7. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
-8. **端到端测试** - 验证 NL2SQL 真实调用
-9. **设计稿** - 基于 UX Map 开始 Figma 设计
-10. **CI/CD 配置** - GitHub Actions 自动化构建与发布
+6. ~~**CI/CD 配置** - GitHub Actions 自动化构建与发布~~ [x] 完成
+7. **本地开发环境** - `docker compose up -d` 启动完整开发栈
+8. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
+9. **端到端测试** - 验证 NL2SQL 真实调用
+10. **设计稿** - 基于 UX Map 开始 Figma 设计
+11. **MVP 功能开发** - 事件追踪 + NL 查询 + 基础仪表盘
 
 ---
 
