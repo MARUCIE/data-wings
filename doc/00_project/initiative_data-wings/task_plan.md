@@ -70,11 +70,42 @@
 - [x] 3.2 形成决策记录
 - [x] 3.3 更新所有文档保持口径一致
 
+### Phase 4: 技术验证（Technical Spike） - [x] 完成
+
+- [x] 4.1 NL2SQL 技术验证
+  - [x] Schema 定义（ClickHouse）
+  - [x] 多 LLM Provider 支持（DeepSeek/Qwen/OpenAI）
+  - [x] 测试用例（Mock 模式验证通过）
+
+### Phase 5: 项目脚手架（Scaffolding） - [x] 完成
+
+- [x] 5.1 Monorepo 初始化
+  - [x] pnpm workspaces + Turborepo
+  - [x] 根目录配置（package.json, turbo.json）
+- [x] 5.2 前端项目（apps/web）
+  - [x] Next.js 14 + React 18 + TypeScript
+  - [x] TailwindCSS 配置
+  - [x] 首页 Landing Page
+  - [x] Dockerfile
+- [x] 5.3 后端 API（services/api）
+  - [x] Go + Gin 框架
+  - [x] 路由定义（health, track, ask, dashboards）
+  - [x] Dockerfile
+- [x] 5.4 AI 服务（services/ai）
+  - [x] FastAPI + Python 3.11
+  - [x] NL2SQL Engine
+  - [x] 配置管理（pydantic-settings）
+  - [x] Dockerfile
+- [x] 5.5 基础设施（infra）
+  - [x] docker-compose.yml
+  - [x] ClickHouse 初始化脚本
+  - [x] .env.example
+
 ---
 
 ## 当前进度
 
-**Phase**: 3 - 对齐（已完成）
+**Phase**: 5 - 项目脚手架（已完成）
 **Status**: 已完成
 **Last Updated**: 2025-01-28
 
@@ -136,11 +167,15 @@
 
 ## 下一步行动
 
-1. **更新 deliverable.md** - 标记所有交付物完成状态
-2. **Git 初始提交** - 提交所有规划文档
-3. **技术 Spike** - 验证 NL2SQL 技术可行性
-4. **设计稿** - 基于 UX Map 开始 Figma 设计
-5. **开发启动** - 按 MVP 范围开始开发
+1. ~~**更新 deliverable.md** - 标记所有交付物完成状态~~ [x] 完成
+2. ~~**Git 初始提交** - 提交所有规划文档~~ [x] 完成
+3. ~~**技术 Spike** - 验证 NL2SQL 技术可行性~~ [x] 完成
+4. ~~**项目脚手架** - 初始化前后端项目结构~~ [x] 完成
+5. **本地开发环境** - `docker compose up -d` 启动完整开发栈
+6. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
+7. **端到端测试** - 验证 NL2SQL 真实调用
+8. **设计稿** - 基于 UX Map 开始 Figma 设计
+9. **SDK 开发** - JavaScript/TypeScript SDK
 
 ---
 
