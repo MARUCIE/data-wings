@@ -33,6 +33,7 @@
 | 快速启动脚本 | 开发 | [x] 完成 | scripts/quickstart.sh |
 | NL2SQL 测试用例 | QA | [x] 完成 | services/ai/tests/ |
 | Full-Loop 验证证据 | QA | [x] 完成 | full_loop_verification_evidence.md |
+| 真实 LLM API 集成 | AI 团队 | [x] 完成 | docker-compose.yml |
 
 ---
 
@@ -166,6 +167,7 @@
 | 2026-01-28 | Web 容器构建成功，API/AI 容器待 Docker 稳定后完成 | AI |
 | 2026-01-28 | Docker E2E 验证通过（Track/Identify/Overview/Ask） | AI |
 | 2026-01-28 | 修复 ClickHouse 端口配置（8123→9000 native protocol） | AI |
+| 2026-01-28 | 真实 LLM API 集成（Gemini 2.0 Flash + Poe 备选） | AI |
 
 ---
 
