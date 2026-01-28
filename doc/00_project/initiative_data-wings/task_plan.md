@@ -173,13 +173,28 @@
   - [x] README.md（快速开始、SDK 用法、API 参考）
   - [x] CONTRIBUTING.md（贡献指南、代码规范）
 
+### Phase 10: 真实 API 集成（Real API Integration） - [x] 完成
+
+- [x] 10.1 Google Gemini (AI Studio)
+  - [x] API 集成实现（v1beta 端点）
+  - [x] 模型配置（gemini-2.0-flash）
+  - [x] JSON 响应模式
+- [x] 10.2 Poe API (OpenAI-compatible)
+  - [x] API 集成实现（chat/completions）
+  - [x] 模型配置（GPT-4o）
+- [x] 10.3 测试验证
+  - [x] test_llm_api.py 测试脚本
+  - [x] Gemini API 测试通过
+  - [x] Poe API 测试通过
+  - [x] NL2SQL 端到端测试通过
+
 ---
 
 ## 当前进度
 
-**Phase**: 9 - 开发者工具（已完成）
+**Phase**: 10 - 真实 API 集成（已完成）
 **Status**: 已完成
-**Last Updated**: 2025-01-28
+**Last Updated**: 2026-01-28
 
 ---
 
