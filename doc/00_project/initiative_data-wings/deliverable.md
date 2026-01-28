@@ -126,7 +126,10 @@
 - [x] Phase 10: 真实 API 集成完成（Gemini + Poe）
 - [x] Phase 11: 开发者体验优化完成
 - [x] Round 1: Full-Loop 验证通过（API 级别）
-- [ ] Round 2: Docker E2E 验证（待 Docker 可用）
+- [~] Round 2: Docker E2E 验证（进行中，Docker Desktop 不稳定）
+  - [x] Web 容器构建成功
+  - [ ] API 容器构建（Docker 连接中断）
+  - [ ] AI 容器构建（Docker 连接中断）
 
 ### 知识沉淀
 
@@ -138,9 +141,11 @@
 
 ### 三端一致性
 
-- [ ] Local / GitHub / Production 版本一致
+- [~] Local / GitHub / Production 版本一致
 - 状态: PARTIAL
-- 原因: 代码已在 GitHub，Docker E2E 待验证
+- Local commit: 801c6df
+- GitHub: https://github.com/MARUCIE/data-wings (已同步)
+- Production: N/A（待 Docker E2E 验证后部署）
 
 ---
 
@@ -153,6 +158,9 @@
 | 2025-01-28 | 更新交付物状态为完成 | AI |
 | 2026-01-28 | 新增 MVP 开发阶段交付物 | AI |
 | 2026-01-28 | 完成 Full-Loop 验证并生成证据 | AI |
+| 2026-01-28 | Dashboard 增强（时间范围/自动刷新/快捷操作） | AI |
+| 2026-01-28 | Docker 构建修复（lock files + .dockerignore） | AI |
+| 2026-01-28 | Web 容器构建成功，API/AI 容器待 Docker 稳定后完成 | AI |
 
 ---
 
