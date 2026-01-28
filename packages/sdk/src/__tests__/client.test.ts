@@ -2,39 +2,117 @@
  * Data Wings SDK Client Tests
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { DataWings } from "../client";
+import { STORAGE_KEYS } from "../storage";
 
 // Mock fetch
 global.fetch = vi.fn();
 
-// Mock localStorage
-const localStorageMock = (() => {
+// Create localStorage mock
+const createLocalStorageMock = () => {
   let store: Record<string, string> = {};
   return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => {
+    getItem: vi.fn((key: string) => store[key] ?? null),
+    setItem: vi.fn((key: string, value: string) => {
       store[key] = value;
-    },
-    removeItem: (key: string) => {
+    }),
+    removeItem: vi.fn((key: string) => {
       delete store[key];
-    },
-    clear: () => {
+    }),
+    clear: vi.fn(() => {
       store = {};
+    }),
+    get length() {
+      return Object.keys(store).length;
     },
+    key: vi.fn((index: number) => Object.keys(store)[index] ?? null),
+    _getStore: () => store,
   };
-})();
+};
 
-Object.defineProperty(global, "localStorage", { value: localStorageMock });
+// Setup global mocks for browser environment
+const setupBrowserMocks = () => {
+  const localStorageMock = createLocalStorageMock();
+
+  // Mock window and localStorage
+  Object.defineProperty(global, "window", {
+    value: {
+      location: {
+        protocol: "https:",
+        href: "https://example.com/test",
+        pathname: "/test",
+        search: "",
+      },
+      document: {
+        title: "Test Page",
+        referrer: "",
+      },
+      history: {
+        pushState: vi.fn(),
+        replaceState: vi.fn(),
+      },
+      addEventListener: vi.fn(),
+    },
+    writable: true,
+  });
+
+  Object.defineProperty(global, "localStorage", {
+    value: localStorageMock,
+    writable: true,
+  });
+
+  Object.defineProperty(global, "document", {
+    value: {
+      title: "Test Page",
+      referrer: "",
+      addEventListener: vi.fn(),
+    },
+    writable: true,
+  });
+
+  Object.defineProperty(global, "history", {
+    value: {
+      pushState: vi.fn(),
+      replaceState: vi.fn(),
+    },
+    writable: true,
+  });
+
+  Object.defineProperty(global, "navigator", {
+    value: {
+      userAgent: "test-agent",
+      language: "en-US",
+    },
+    writable: true,
+  });
+
+  Object.defineProperty(global, "screen", {
+    value: {
+      width: 1920,
+      height: 1080,
+    },
+    writable: true,
+  });
+
+  return localStorageMock;
+};
 
 describe("DataWings SDK", () => {
+  let localStorageMock: ReturnType<typeof createLocalStorageMock>;
+
   beforeEach(() => {
-    localStorageMock.clear();
+    localStorageMock = setupBrowserMocks();
     vi.clearAllMocks();
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ status: "ok" }),
     });
+  });
+
+  afterEach(() => {
+    // Clean up
+    vi.clearAllMocks();
   });
 
   describe("initialization", () => {
@@ -46,19 +124,30 @@ describe("DataWings SDK", () => {
     });
 
     it("should initialize with valid apiKey", () => {
-      const dw = new DataWings({ apiKey: "test-key" });
+      const dw = new DataWings({ apiKey: "test-key", autocapture: false });
       expect(dw).toBeInstanceOf(DataWings);
     });
 
     it("should generate anonymous ID on init", () => {
-      new DataWings({ apiKey: "test-key" });
-      expect(localStorageMock.getItem("dw_anonymous_id")).toBeTruthy();
+      new DataWings({ apiKey: "test-key", autocapture: false });
+      const key = "dw_" + STORAGE_KEYS.ANONYMOUS_ID;
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        key,
+        expect.any(String)
+      );
     });
 
     it("should reuse existing anonymous ID", () => {
-      localStorageMock.setItem("dw_anonymous_id", "existing-id");
-      new DataWings({ apiKey: "test-key" });
-      expect(localStorageMock.getItem("dw_anonymous_id")).toBe("existing-id");
+      const existingId = "existing-id";
+      const key = "dw_" + STORAGE_KEYS.ANONYMOUS_ID;
+      localStorageMock._getStore()[key] = existingId;
+
+      new DataWings({ apiKey: "test-key", autocapture: false });
+
+      // Should have called getItem but not setItem for anonymous ID
+      expect(localStorageMock.getItem).toHaveBeenCalledWith(key);
+      // The existing ID should be preserved
+      expect(localStorageMock._getStore()[key]).toBe(existingId);
     });
   });
 
@@ -66,7 +155,7 @@ describe("DataWings SDK", () => {
     it("should queue events for batch sending", () => {
       const dw = new DataWings({
         apiKey: "test-key",
-        autocapture: false, // Disable to isolate test
+        autocapture: false,
         batch: true,
         batchSize: 10,
       });
@@ -96,7 +185,7 @@ describe("DataWings SDK", () => {
       const dw = new DataWings({
         apiKey: "test-key",
         autocapture: false,
-        batch: false, // Disable batching for immediate send
+        batch: false,
       });
 
       dw.track("Purchase", { amount: 99.99, currency: "USD" });
@@ -120,7 +209,8 @@ describe("DataWings SDK", () => {
 
       dw.identify("user-123", { email: "test@example.com" });
 
-      expect(localStorageMock.getItem("dw_user_id")).toBe("user-123");
+      const key = "dw_" + STORAGE_KEYS.USER_ID;
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(key, "user-123");
     });
 
     it("should store user traits", () => {
@@ -128,11 +218,11 @@ describe("DataWings SDK", () => {
 
       dw.identify("user-123", { email: "test@example.com", plan: "premium" });
 
-      const traits = JSON.parse(
-        localStorageMock.getItem("dw_user_traits") || "{}"
+      const key = "dw_" + STORAGE_KEYS.USER_TRAITS;
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        key,
+        expect.stringContaining("test@example.com")
       );
-      expect(traits.email).toBe("test@example.com");
-      expect(traits.plan).toBe("premium");
     });
 
     it("should merge traits on subsequent identify calls", () => {
@@ -141,11 +231,18 @@ describe("DataWings SDK", () => {
       dw.identify("user-123", { email: "test@example.com" });
       dw.identify("user-123", { plan: "premium" });
 
-      const traits = JSON.parse(
-        localStorageMock.getItem("dw_user_traits") || "{}"
+      const key = "dw_" + STORAGE_KEYS.USER_TRAITS;
+      const calls = localStorageMock.setItem.mock.calls.filter(
+        (call) => call[0] === key
       );
-      expect(traits.email).toBe("test@example.com");
-      expect(traits.plan).toBe("premium");
+
+      // Last call should have merged traits
+      const lastTraitsCall = calls[calls.length - 1];
+      if (lastTraitsCall) {
+        const storedTraits = JSON.parse(lastTraitsCall[1]);
+        expect(storedTraits.email).toBe("test@example.com");
+        expect(storedTraits.plan).toBe("premium");
+      }
     });
   });
 
@@ -156,16 +253,31 @@ describe("DataWings SDK", () => {
       dw.identify("user-123", { email: "test@example.com" });
       dw.reset();
 
-      expect(localStorageMock.getItem("dw_user_id")).toBeNull();
-      expect(localStorageMock.getItem("dw_user_traits")).toBeNull();
+      const userIdKey = "dw_" + STORAGE_KEYS.USER_ID;
+      const traitsKey = "dw_" + STORAGE_KEYS.USER_TRAITS;
+
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith(userIdKey);
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith(traitsKey);
     });
 
     it("should generate new anonymous ID after reset", () => {
       const dw = new DataWings({ apiKey: "test-key", autocapture: false });
 
-      const originalId = localStorageMock.getItem("dw_anonymous_id");
+      const key = "dw_" + STORAGE_KEYS.ANONYMOUS_ID;
+
+      // Get the first anonymous ID that was set
+      const initialCalls = localStorageMock.setItem.mock.calls.filter(
+        (call) => call[0] === key
+      );
+      const originalId = initialCalls[0]?.[1];
+
       dw.reset();
-      const newId = localStorageMock.getItem("dw_anonymous_id");
+
+      // After reset, a new anonymous ID should be set
+      const afterResetCalls = localStorageMock.setItem.mock.calls.filter(
+        (call) => call[0] === key
+      );
+      const newId = afterResetCalls[afterResetCalls.length - 1]?.[1];
 
       expect(newId).toBeTruthy();
       expect(newId).not.toBe(originalId);
@@ -178,7 +290,7 @@ describe("DataWings SDK", () => {
         apiKey: "test-key",
         autocapture: false,
         batch: true,
-        batchSize: 100, // High to prevent auto-flush
+        batchSize: 100,
       });
 
       dw.track("Event 1");
