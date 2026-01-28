@@ -166,6 +166,12 @@
   - [x] NL2SQL Engine 单元测试
   - [x] API 端点测试
   - [x] Schema 注入验证
+- [x] 9.4 Go API 测试
+  - [x] events_test.go（事件追踪测试）
+  - [x] dashboard_test.go（仪表盘 CRUD 测试）
+- [x] 9.5 项目文档
+  - [x] README.md（快速开始、SDK 用法、API 参考）
+  - [x] CONTRIBUTING.md（贡献指南、代码规范）
 
 ---
 
