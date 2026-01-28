@@ -101,11 +101,33 @@
   - [x] ClickHouse 初始化脚本
   - [x] .env.example
 
+### Phase 6: SDK 开发（SDK Development） - [x] 完成
+
+- [x] 6.1 SDK 项目结构
+  - [x] TypeScript 配置（tsup 构建）
+  - [x] ESM + CJS 双格式输出
+- [x] 6.2 核心功能
+  - [x] 事件追踪（track）
+  - [x] 页面追踪（page）
+  - [x] 用户识别（identify）
+  - [x] 用户重置（reset）
+  - [x] 批量发送（batch）
+- [x] 6.3 自动采集
+  - [x] 页面浏览自动追踪
+  - [x] SPA 路由变化监听（History API）
+  - [x] 点击事件自动采集（可选）
+- [x] 6.4 存储抽象
+  - [x] localStorage / sessionStorage / cookie / memory
+  - [x] 匿名 ID 持久化
+  - [x] 会话管理
+- [x] 6.5 测试
+  - [x] 单元测试（Vitest）
+
 ---
 
 ## 当前进度
 
-**Phase**: 5 - 项目脚手架（已完成）
+**Phase**: 6 - SDK 开发（已完成）
 **Status**: 已完成
 **Last Updated**: 2025-01-28
 
@@ -171,11 +193,12 @@
 2. ~~**Git 初始提交** - 提交所有规划文档~~ [x] 完成
 3. ~~**技术 Spike** - 验证 NL2SQL 技术可行性~~ [x] 完成
 4. ~~**项目脚手架** - 初始化前后端项目结构~~ [x] 完成
-5. **本地开发环境** - `docker compose up -d` 启动完整开发栈
-6. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
-7. **端到端测试** - 验证 NL2SQL 真实调用
-8. **设计稿** - 基于 UX Map 开始 Figma 设计
-9. **SDK 开发** - JavaScript/TypeScript SDK
+5. ~~**SDK 开发** - JavaScript/TypeScript SDK~~ [x] 完成
+6. **本地开发环境** - `docker compose up -d` 启动完整开发栈
+7. **配置 API Keys** - 复制 `.env.example` 到 `.env` 并填入 DeepSeek API Key
+8. **端到端测试** - 验证 NL2SQL 真实调用
+9. **设计稿** - 基于 UX Map 开始 Figma 设计
+10. **CI/CD 配置** - GitHub Actions 自动化构建与发布
 
 ---
 
