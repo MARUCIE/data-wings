@@ -7,7 +7,7 @@ WORKDIR /app
 RUN pip install --no-cache-dir hatchling
 
 # Copy project files
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 COPY src ./src
 
 # Build wheel
