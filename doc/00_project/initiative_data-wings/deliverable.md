@@ -139,9 +139,10 @@
 
 - [x] PDCA 四文档: PRD + UX Map + 系统架构 + 优化计划（SEO）
 - [x] Full-Loop 验证证据: full_loop_verification_evidence.md
-- [ ] Skills: 待抽象（多角色头脑风暴 SOP 可提取为 Skill）
+- [x] Skills: 已完成（multi-role-brainstorm Skill 已抽象到 AI-tools）
 - [ ] CLAUDE.md / AGENTS.md: N/A（本任务为 MVP 开发，无跨任务可复用规则）
 - [x] Rolling Ledger: ROLLING_REQUIREMENTS_AND_PROMPTS.md
+- [x] Skills: multi-role-brainstorm（多角色头脑风暴 SOP 已抽象为 AI-tools Skill）
 
 ### 三端一致性
 
@@ -168,6 +169,7 @@
 | 2026-01-28 | Docker E2E 验证通过（Track/Identify/Overview/Ask） | AI |
 | 2026-01-28 | 修复 ClickHouse 端口配置（8123→9000 native protocol） | AI |
 | 2026-01-28 | 真实 LLM API 集成（Gemini 2.0 Flash + Poe 备选） | AI |
+| 2026-01-28 | Skills 抽象完成（multi-role-brainstorm SOP） | AI |
 
 ---
 
