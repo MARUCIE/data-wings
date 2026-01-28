@@ -152,11 +152,26 @@
   - [x] Ask 页面（NL 查询界面）
   - [x] 首页导航更新
 
+### Phase 9: 开发者工具（Developer Experience） - [x] 完成
+
+- [x] 9.1 Makefile
+  - [x] 统一命令入口（install, dev, build, test, docker）
+  - [x] 种子数据命令（seed, seed-clean）
+  - [x] 发布命令（release-patch/minor/major）
+- [x] 9.2 种子数据生成器
+  - [x] scripts/seed_data.py
+  - [x] 真实数据分布模拟（事件类型、设备、地区）
+  - [x] ClickHouse 批量写入
+- [x] 9.3 AI 服务测试
+  - [x] NL2SQL Engine 单元测试
+  - [x] API 端点测试
+  - [x] Schema 注入验证
+
 ---
 
 ## 当前进度
 
-**Phase**: 8 - MVP 功能开发（已完成）
+**Phase**: 9 - 开发者工具（已完成）
 **Status**: 已完成
 **Last Updated**: 2025-01-28
 

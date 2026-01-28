@@ -1,0 +1,2 @@
+# Requirements for seed data script
+clickhouse-connect>=0.7.0
