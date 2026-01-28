@@ -229,7 +229,7 @@ def generate_events(
                 "event_id": str(uuid.uuid4()),
                 "event_name": event_type["name"],
                 "event_time": event_time,
-                "event_date": event_time.strftime("%Y-%m-%d"),
+                "event_date": event_time.date(),
                 "user_id": user_id,
                 "anonymous_id": anonymous_id,
                 "properties": json.dumps(event_type["properties"]()),
