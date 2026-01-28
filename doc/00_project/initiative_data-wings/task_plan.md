@@ -188,12 +188,27 @@
   - [x] Poe API 测试通过
   - [x] NL2SQL 端到端测试通过
 
+### Phase 11: 开发者体验优化（Developer Experience） - [x] 完成
+
+- [x] 11.1 快速启动脚本
+  - [x] scripts/quickstart.sh 一键启动
+  - [x] 自动检查依赖（Node.js, Python, Docker）
+  - [x] 自动初始化数据库 Schema
+  - [x] 自动生成种子数据
+- [x] 11.2 NL2SQL 测试用例
+  - [x] 20+ 测试场景覆盖
+  - [x] 基础计数、时间查询、聚合查询
+  - [x] 中文查询支持测试
+  - [x] SQL 关键词验证
+- [x] 11.3 依赖管理
+  - [x] services/ai/requirements.txt
+
 ---
 
 ## 当前进度
 
-**Phase**: 10 - 真实 API 集成（已完成）
-**Status**: 已完成
+**Phase**: 11 - 开发者体验优化（已完成）
+**Status**: MVP 基础功能完成
 **Last Updated**: 2026-01-28
 
 ---
@@ -213,6 +228,8 @@
 | D009 | 多语言 | 子目录模式 /zh-CN/ | SEO 友好，便于管理 | 2025-01-28 |
 | D010 | 技术栈-前端 | React + TypeScript + TailwindCSS | 社区活跃，招人容易 | 2025-01-28 |
 | D011 | 技术栈-后端 | Go (API) + Python (AI) | Go 高性能，Python AI 生态 | 2025-01-28 |
+| D012 | LLM 优先级 | Gemini > Poe > DeepSeek | Gemini 免费额度最高($300)，Poe 灵活切换模型 | 2026-01-28 |
+| D013 | Gemini 模型 | gemini-2.0-flash | 最新稳定版本，性价比高 | 2026-01-28 |
 
 ---
 
