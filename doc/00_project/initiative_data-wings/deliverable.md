@@ -141,7 +141,7 @@
 - [x] Full-Loop 验证证据: full_loop_verification_evidence.md
 - [ ] Skills: 待抽象（多角色头脑风暴 SOP 可提取为 Skill）
 - [ ] CLAUDE.md / AGENTS.md: N/A（本任务为 MVP 开发，无跨任务可复用规则）
-- [ ] Rolling Ledger: 待创建
+- [x] Rolling Ledger: ROLLING_REQUIREMENTS_AND_PROMPTS.md
 
 ### 三端一致性
 
