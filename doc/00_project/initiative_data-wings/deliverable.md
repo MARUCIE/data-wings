@@ -126,10 +126,13 @@
 - [x] Phase 10: 真实 API 集成完成（Gemini + Poe）
 - [x] Phase 11: 开发者体验优化完成
 - [x] Round 1: Full-Loop 验证通过（API 级别）
-- [~] Round 2: Docker E2E 验证（进行中，Docker Desktop 不稳定）
+- [x] Round 2: Docker E2E 验证通过
   - [x] Web 容器构建成功
-  - [ ] API 容器构建（Docker 连接中断）
-  - [ ] AI 容器构建（Docker 连接中断）
+  - [x] API 容器构建成功
+  - [x] AI 容器构建成功
+  - [x] ClickHouse + Redis 容器运行正常
+  - [x] Track/Identify/Overview API 端点验证通过
+  - [x] API→AI NL2SQL 通信验证通过
 
 ### 知识沉淀
 
@@ -141,11 +144,11 @@
 
 ### 三端一致性
 
-- [~] Local / GitHub / Production 版本一致
-- 状态: PARTIAL
-- Local commit: 801c6df
-- GitHub: https://github.com/MARUCIE/data-wings (已同步)
-- Production: N/A（待 Docker E2E 验证后部署）
+- [x] Local / GitHub 版本一致
+- 状态: SYNCED (Local E2E Verified)
+- Local commit: 3597c1d
+- GitHub: https://github.com/MARUCIE/data-wings (待推送)
+- Production: N/A（本地开发环境，无生产部署）
 
 ---
 
@@ -161,6 +164,8 @@
 | 2026-01-28 | Dashboard 增强（时间范围/自动刷新/快捷操作） | AI |
 | 2026-01-28 | Docker 构建修复（lock files + .dockerignore） | AI |
 | 2026-01-28 | Web 容器构建成功，API/AI 容器待 Docker 稳定后完成 | AI |
+| 2026-01-28 | Docker E2E 验证通过（Track/Identify/Overview/Ask） | AI |
+| 2026-01-28 | 修复 ClickHouse 端口配置（8123→9000 native protocol） | AI |
 
 ---
 
