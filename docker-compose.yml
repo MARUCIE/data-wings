@@ -46,10 +46,19 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - DW_LLM_PROVIDER=deepseek
+      # LLM Provider Priority: gemini > poe > deepseek > qwen > openai
+      - DW_LLM_PROVIDER=gemini
+      # Google AI Studio - $300 free credit (expires 2026-03-26)
+      - DW_GEMINI_API_KEY=AIzaSyB36rx4b2LsqkXz8gLEZmKeX6stgIl7AIk
+      - DW_GEMINI_MODEL=gemini-2.0-flash
+      # Poe API - Backup ($50-100/month)
+      - DW_POE_API_KEY=qwcvD525r6kypXC5KQR_H3tInVXMi6TtSeA0zCS21NA
+      - DW_POE_MODEL=GPT-4o
+      # Optional providers
       - DW_DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - DW_QWEN_API_KEY=${QWEN_API_KEY:-}
       - DW_OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Database
       - DW_CLICKHOUSE_HOST=clickhouse
       - DW_CLICKHOUSE_PORT=8123
       - DW_REDIS_URL=redis://redis:6379/0
