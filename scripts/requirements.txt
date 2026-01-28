@@ -1,2 +1,4 @@
-# Requirements for seed data script
+# Requirements for scripts
 clickhouse-connect>=0.7.0
+httpx>=0.25.0
+python-dotenv>=1.0.0
