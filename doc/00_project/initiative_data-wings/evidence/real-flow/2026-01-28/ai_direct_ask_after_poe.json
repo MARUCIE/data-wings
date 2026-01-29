@@ -1,0 +1,1 @@
+{"question":"How many events happened in the last 7 days?","sql":"SELECT COUNT(*) AS event_count FROM events WHERE event_date >= today() - 7","explanation":"This query counts the total number of events that occurred in the last 7 days by filtering the events table where the event_date is greater than or equal to 7 days ago.","confidence":0.95,"data":null,"error":null}

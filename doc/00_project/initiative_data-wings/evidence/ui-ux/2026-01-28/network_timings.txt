@@ -1,0 +1,7 @@
+# Network timings (curl)
+2026-01-28T20:05:43+08:00
+GET / -> 200 time_total=5.422423s
+GET /ask -> 200 time_total=2.691196s
+GET /dashboard -> 200 time_total=0.134993s
+GET /api/v1/overview -> 200 time_total=0.012204s
+POST /api/v1/ask -> 200 time_total=6.151013s
