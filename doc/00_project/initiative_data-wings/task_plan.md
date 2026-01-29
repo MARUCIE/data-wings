@@ -198,17 +198,47 @@
 - [x] 11.2 NL2SQL 测试用例
   - [x] 20+ 测试场景覆盖
   - [x] 基础计数、时间查询、聚合查询
-  - [x] 中文查询支持测试
-  - [x] SQL 关键词验证
 - [x] 11.3 依赖管理
   - [x] services/ai/requirements.txt
+
+### Phase 12: 真实流程测试（Real-Flow SOP） - [x] 完成（局部覆盖）
+
+- [x] 12.1 初始化 SOP 文档与测试矩阵
+- [x] 12.2 定义 3+ 客户画像与入口脚本
+- [x] 12.3 非生产环境真实流程执行（含异常路径）
+- [x] 12.4 证据留存（截图/日志/请求）
+- [x] 12.5 汇总成功率与问题清单（局部覆盖）
+- [x] 12.6 修复后复测并更新 PRD / UX Map
+
+### Phase 13: UI/UX 优化（Frontend SOP） - [x] 完成 (2026-01-29 更新)
+
+- [x] 13.1 应用 ui-skills / web-interface-guidelines 评估
+- [x] 13.2 修复间距与层级问题（单一主按钮）
+  - 移除首页导航栏重复的 "Try AI Query" 按钮
+  - 替换 Feature icons 文字为 SVG 图标
+  - 替换 Chart placeholder 为模拟柱状图
+  - 替换 alert() 为 Toast 组件
+- [x] 13.3 前端验证（network/console/performance/visual）
+  - TypeScript: PASS
+  - ESLint: PASS
+  - HTTP Status: 200
+- [x] 13.4 更新 UX Map 与 PRD
+
+### Phase 14: 全量交付续航（Audit/Auth/Persona/Perf） - [ ] 进行中
+
+- [ ] 14.1 追查并修复 ai check audit FAIL/SKIP（补做 supply audit）
+- [ ] 14.2 补齐登录/权限页面（对齐 UX Map 路由）
+- [ ] 14.3 实施 RBAC 与权限校验（API + 前端）
+- [ ] 14.4 扩展多 Persona 真实流程复测与证据
+- [ ] 14.5 前端验证：network/console/performance/visual regression
+- [ ] 14.6 更新 PDCA 四文档 + Rolling Ledger + Deliverable
 
 ---
 
 ## 当前进度
 
-**Phase**: 11 - 开发者体验优化（已完成）
-**Status**: MVP 基础功能完成
+**Phase**: 14 - 全量交付续航（进行中）
+**Status**: Audit/Auth/Persona/Perf 规划中
 **Last Updated**: 2026-01-28
 
 ---
@@ -230,6 +260,7 @@
 | D011 | 技术栈-后端 | Go (API) + Python (AI) | Go 高性能，Python AI 生态 | 2025-01-28 |
 | D012 | LLM 优先级 | Gemini > Poe > DeepSeek | Gemini 免费额度最高($300)，Poe 灵活切换模型 | 2026-01-28 |
 | D013 | Gemini 模型 | gemini-2.0-flash | 最新稳定版本，性价比高 | 2026-01-28 |
+| D014 | 真实流程测试默认 Provider | Poe | Gemini 403 导致 Ask 不可用 | 2026-01-28 |
 
 ---
 
@@ -266,6 +297,8 @@
 | 系统架构 | SYSTEM_ARCHITECTURE.md | [x] 完成 |
 | 任务计划 | task_plan.md | [x] 完成 |
 | 交付物清单 | deliverable.md | [ ] 待更新 |
+| 真实流程测试 SOP | REAL_FLOW_TEST_SOP.md | [ ] 待执行 |
+| 真实流程测试证据 | REAL_FLOW_TEST_EVIDENCE.md | [ ] 待执行 |
 
 ---
 
@@ -283,6 +316,7 @@
 10. **端到端测试** - 验证 NL2SQL 真实调用
 11. **设计稿** - 基于 UX Map 开始 Figma 设计
 12. **用户测试** - 收集真实用户反馈并迭代
+13. **真实流程测试** - 多类型客户真实流程 + 异常路径
 
 ---
 

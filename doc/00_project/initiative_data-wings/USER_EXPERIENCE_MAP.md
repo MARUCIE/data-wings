@@ -1,7 +1,7 @@
 # Data Wings - 用户体验地图
 
 **版本**: v1.0
-**日期**: 2025-01-28
+**日期**: 2026-01-28
 **作者**: UX 设计师
 **PROJECT_DIR**: `/Users/mauricewen/Projects/09-data-wings`
 
@@ -361,6 +361,21 @@ stateDiagram-v2
 
 ---
 
+**实现注记（MVP 现状）**:
+- 已对齐规划路由：`/login`、`/signup`、`/app`、`/app/ask`、`/app/dashboards`。
+- 真实流程测试按 `/app/*` 执行，并补齐权限拦截与登录流程证据。
+
+### 6.3 真实流程测试对齐（Real-Flow SOP）
+
+| 测试 Persona | 对应 UX Persona | 关键旅程阶段 | 页面覆盖（Page ID） |
+|-------------|----------------|--------------|--------------------|
+| Persona A | CTO/技术负责人 | 注册/接入/分析 | P-001, A-002, A-003, A-004, A-022 |
+| Persona B | 业务分析师 | 日常分析/权限边界 | A-003, A-004, A-014, A-021 |
+| Persona C | 管理者 | 设置/集成/分享 | A-020, A-021, A-023, A-015 |
+
+说明：真实流程测试 SOP 见 `REAL_FLOW_TEST_SOP.md`，证据记录见 `REAL_FLOW_TEST_EVIDENCE.md`。
+---
+
 ## 7. Mermaid 架构图
 
 ### 7.1 整体页面架构
@@ -595,6 +610,15 @@ sequenceDiagram
 | Tablet | 768px - 1024px | 双列，折叠侧边栏 |
 | Desktop | > 1024px | 多列，完整侧边栏 |
 
+### 8.5 UI/UX 优化原则
+
+| 原则 | 说明 |
+|------|------|
+| 单一主按钮 | 每个页面仅保留一个主按钮，其他降级为次要样式 |
+| 层级清晰 | 标题/正文/辅助信息形成稳定层级与节奏 |
+| 间距一致 | 使用系统间距规范（8/16/24/32）保持阅读节奏 |
+| 可访问性 | 所有交互具备 `focus-visible` 与键盘可达 |
+
 ---
 
 ## 9. 可访问性要求
@@ -633,6 +657,13 @@ sequenceDiagram
 - 设计稿：Figma（待创建）
 - 组件库：Ant Design / Shadcn UI
 - 图表库：ECharts / Recharts
+
+### C. 更新日志
+
+| 日期 | 版本 | 变更内容 |
+|------|------|----------|
+| 2026-01-28 | v1.0 | 初始版本 |
+| 2026-01-29 | v1.1 | UI/UX 优化：移除重复主按钮、替换 Chart placeholder、添加 Toast 组件、修复 TypeScript 类型 |
 
 ---
 

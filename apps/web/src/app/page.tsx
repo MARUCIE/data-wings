@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <main className="min-h-dvh bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,25 +16,31 @@ export default function Home() {
               </span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">
-                Dashboard
+              <Link
+                href="/app"
+                className="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                App
               </Link>
-              <Link href="/ask" className="text-slate-600 hover:text-slate-900">
+              <Link
+                href="/app/ask"
+                className="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
                 Ask AI
               </Link>
               <a
                 href="https://github.com/MARUCIE/data-wings"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-600 hover:text-slate-900"
+                className="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
                 GitHub
               </a>
               <Link
-                href="/ask"
-                className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                href="/login"
+                className="border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
               >
-                Try AI Query
+                Sign in
               </Link>
             </nav>
           </div>
@@ -55,16 +61,16 @@ export default function Home() {
           </p>
           <div className="mt-10 flex justify-center gap-4">
             <Link
-              href="/ask"
-              className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/25"
+              href="/app/ask"
+              className="bg-primary-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
               Try AI Query
             </Link>
             <Link
-              href="/dashboard"
-              className="bg-white text-slate-900 px-8 py-3 rounded-lg text-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors"
+              href="/app"
+              className="bg-white text-slate-900 px-8 py-3 rounded-lg text-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
-              View Dashboard
+              Open App
             </Link>
           </div>
         </div>
@@ -100,8 +106,14 @@ export default function Home() {
                     Your DAU increased by <span className="text-green-600 font-semibold">+12%</span> last week,
                     from 45,230 to 50,658 daily active users. The peak was on Thursday with 54,120 users.
                   </p>
-                  <div className="mt-4 h-32 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
-                    [Chart Placeholder]
+                  <div className="mt-4 h-32 bg-slate-50 rounded-lg flex items-end gap-1 p-4">
+                    {[45, 52, 48, 61, 54, 58, 50].map((h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 bg-primary-400 rounded-t transition-all hover:bg-primary-500"
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -117,36 +129,35 @@ export default function Home() {
             Why Data Wings?
           </h2>
           <div className="mt-12 grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "AI-Native",
-                description: "Ask questions in natural language. Get instant insights without writing SQL.",
-                icon: "AI",
-              },
-              {
-                title: "Open Source",
-                description: "MIT licensed core. Self-host or use our cloud. No vendor lock-in.",
-                icon: "OS",
-              },
-              {
-                title: "Auto-Capture",
-                description: "Zero-config event tracking. Just install the SDK and start analyzing.",
-                icon: "AC",
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="bg-white p-6 rounded-xl border border-slate-200"
-              >
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-primary-600 font-bold">{feature.icon}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-slate-600">{feature.description}</p>
+            <div className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
               </div>
-            ))}
+              <h3 className="text-xl font-semibold text-slate-900">AI-Native</h3>
+              <p className="mt-2 text-slate-600">Ask questions in natural language. Get instant insights without writing SQL.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900">Open Source</h3>
+              <p className="mt-2 text-slate-600">MIT licensed core. Self-host or use our cloud. No vendor lock-in.</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900">Auto-Capture</h3>
+              <p className="mt-2 text-slate-600">Zero-config event tracking. Just install the SDK and start analyzing.</p>
+            </div>
           </div>
         </div>
       </section>

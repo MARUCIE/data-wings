@@ -260,3 +260,231 @@
 猪哥云（四川）网络科技有限公司 | 合规网 www.hegui.com
 猪哥云-数据产品部-Maurice | maurice_wen@proton.me
 2025 猪哥云-灵阙企业级智能体平台
+
+---
+
+### 2026-01-28 | 多类型客户真实流程测试 SOP 启动
+
+**任务**: 规划多类型客户真实流程测试（Persona + 入口脚本 + 异常路径）
+
+**已完成**:
+- 读取 task_plan.md 与 notes.md，确认进入 Planning with Files 循环
+- 基于现有代码与 UX Map 汇总入口与路由
+
+**证据与来源**:
+- Web 路由（Next.js App Router）
+  - `/` → apps/web/src/app/page.tsx
+  - `/ask` → apps/web/src/app/ask/page.tsx
+  - `/dashboard` → apps/web/src/app/dashboard/page.tsx
+  - `/api/health` → apps/web/src/app/api/health/route.ts
+- API 路由（Go API）
+  - `/health`、`/api/v1/track`、`/api/v1/identify`、`/api/v1/batch`
+  - `/api/v1/query`、`/api/v1/ask`、`/api/v1/overview`
+  - `/api/v1/dashboards`（list/get/create）
+  - 来源: services/api/cmd/server/main.go
+- AI 服务（FastAPI）
+  - `/health`、`/api/v1/ask`、`/api/v1/insights`
+  - 来源: services/ai/src/main.py
+- UX Map 页面清单（计划覆盖）
+  - 公开页: P-001 ~ P-010
+  - 应用页: A-001 ~ A-023
+  - 来源: USER_EXPERIENCE_MAP.md
+
+**待补齐**:
+- 非生产环境地址与测试账号
+- 真实 API Key 与权限分级信息
+
+
+---
+
+### 2026-01-28 | Real-Flow 预检（API/AI）
+
+**执行范围**:
+- API/AI/ClickHouse 健康检查
+- Persona A/B/C API 流程（identify/track/overview/ask/dashboards）
+
+**证据路径**:
+- `doc/00_project/initiative_data-wings/evidence/real-flow/2026-01-28/`
+
+**发现问题**:
+1. AI NL2SQL 请求 403（Gemini API Key 失效）
+2. Ask/Query 扫描错误：`converting String to *interface {} is unsupported`
+3. MVP 路由实现与 UX Map 规划存在偏差（/ask,/dashboard vs /app/*）
+
+**影响**:
+- Ask 端到端链路不可用或返回空结果
+- 查询结果无法正常返回
+
+**下一步**:
+- 修复 ClickHouse 查询扫描逻辑
+- 移除硬编码 API Key，改为环境变量注入并重启服务
+- 继续 UI 人工流程测试并补充截图证据
+
+
+---
+
+### 2026-01-28 | UX Map 人工测试（Homepage → Ask → Dashboard）
+
+**Persona A（Owner/Admin）**:
+- Step 1: 首页（证据：persona-a_step-1_home.png）
+- Step 2: Ask 页面（证据：persona-a_step-2_ask-page.png）
+- Step 3: Ask 提交后结果（修复前：persona-a_step-4_ask-result.png）
+- Step 4: Dashboard 页面（证据：persona-a_step-5_dashboard.png）
+- Step 5: Ask 修复后结果（证据：persona-a_step-4_ask-result_after_fix.png）
+
+**异常/卡点**:
+- Ask 修复前因 LLM 403 失败，已切换到 Poe Provider 并复测通过
+
+**证据路径**:
+- `doc/00_project/initiative_data-wings/evidence/real-flow/2026-01-28/`
+
+
+---
+
+### 2026-01-28 | Round 1 自动化验证（ai check）
+
+- 结果: 通过
+- 运行目录: /Users/mauricewen/AI-tools/outputs/check/20260128-114049-8a4cbbd7
+- 备注: audit FAIL/SKIP（检查器提示）
+
+
+---
+
+### 2026-01-28 | API 契约/错误码核对（后端变更）
+
+- `/api/v1/ask` 缺失 question → 400（证据：persona-b_ask_invalid_after_restart.json）
+- `/api/v1/dashboards` 缺失 name → 400（证据：persona-c_dashboard_create_invalid_after_restart.json）
+- `/api/v1/ask` 正常返回 data（证据：persona-b_ask_after_fix2.json）
+
+
+---
+
+### 2026-01-28 | UI 测试发现 CORS 问题
+
+- 现象: Dashboard 页面显示 Retry，数据未加载
+- 根因: 前端运行端口 3100 未在 API CORS 白名单
+- 修复: docker-compose.yml 增加 `CORS_ORIGINS=http://localhost:3000,http://localhost:3100`，AI CORS 同步更新
+- 证据: persona-a_step-4_dashboard_3100.png
+
+
+---
+
+### 2026-01-28 | Dashboard CORS 修复后复测
+
+- 结果: Dashboard 正常加载（无 Retry）
+- 证据: persona-a_step-4_dashboard_3100_after_fix.png
+
+
+---
+
+### 2026-01-28 | 前端端口说明
+
+- 由于本机 3000 端口被其他项目占用，Data Wings 前端使用 `PORT=3100` 启动进行测试。
+- 证据与截图均基于 3100 端口。
+
+
+---
+
+### 2026-01-28 | Round 1 自动化验证（ai check - 修复后）
+
+- 结果: 通过
+- 运行目录: /Users/mauricewen/AI-tools/outputs/check/20260128-115301-b75533cf
+- 备注: audit FAIL/SKIP（检查器提示）
+
+
+---
+
+### 2026-01-28 | UI/UX 优化启动
+
+**范围**:
+- Home / Ask / Dashboard 页面
+- 按 ui-skills 与 web-interface-guidelines 进行检查
+
+**待优化点**:
+- 首页存在多个主按钮（层级混乱）
+- 焦点样式与可访问性需增强
+- 页面高度使用 `min-h-screen`（需改为 `min-h-dvh`）
+
+
+---
+
+### 2026-01-28 | UI/UX 优化证据与验证
+
+**应用规范**:
+- ui-skills
+- web-interface-guidelines
+
+**改动要点**:
+- 首页保留单一主按钮，导航 CTA 降级
+- 全站 `min-h-screen` → `min-h-dvh`
+- 增强 focus-visible 样式
+- Ask 页面加载状态去除动画
+
+**证据路径**:
+- UI 截图: `doc/00_project/initiative_data-wings/evidence/ui-ux/2026-01-28/`
+  - home.png, home_to_ask.png, ask_result.png, dashboard.png
+- Network timings: `.../network_timings.txt`
+- Console logs: `.../web_console.log`, `.../api_ai_console.log`
+
+
+---
+
+### 2026-01-28 | UX Map 人工复测（UI/UX Scope）
+
+- 路径: Home → Ask → Dashboard（MVP 现有路由）
+- 结果: 单一主按钮层级清晰，焦点可见，页面可用
+- 证据: `doc/00_project/initiative_data-wings/evidence/ui-ux/2026-01-28/`
+- 备注: 登录/权限页未实现，相关路径未覆盖
+
+
+---
+
+### 2026-01-28 | UI/UX SOP Round 1 自动化验证（ai check）
+
+- 结果: 通过
+- 运行目录: /Users/mauricewen/AI-tools/outputs/check/20260128-120746-d19ea6d2
+- 备注: audit FAIL/SKIP（检查器提示）
+
+
+---
+
+### 2026-01-28 | 全量交付续航启动（Audit/Auth/Persona/Perf）
+
+- 已重读 task_plan.md / notes.md / deliverable.md
+- 范围: audit 修复 + 登录/权限页面 + 多 Persona 复测 + 前端性能与视觉回归证据
+- ralph loop: max 12, completion promise DONE
+- 待办证据: supply.audit 输出、登录/权限流程截图、Persona 复测日志、性能与视觉对比截图
+
+---
+
+### 2026-01-29 | UI/UX 优化 SOP 执行
+
+**执行工具**: Claude Chrome MCP + Playwright MCP (fallback) + 代码审查
+
+**检查规范**: ui-skills + web-interface-guidelines (Savyforson 四核心原则)
+
+**发现问题**:
+
+| 页面 | 问题 | 严重性 | 修复状态 |
+|------|------|--------|----------|
+| page.tsx | 导航栏重复 "Try AI Query" 按钮 | HIGH | OK |
+| page.tsx | Feature icons 用文字替代 SVG | LOW | OK |
+| page.tsx | Chart placeholder 空白文本 | HIGH | OK |
+| app/page.tsx | Share 使用 alert() 阻塞 | HIGH | OK |
+| app/page.tsx | handleExport 变量引用顺序错误 | HIGH | OK |
+| app/layout.tsx | TypeScript Route 类型错误 | MED | OK |
+
+**修复内容**:
+
+1. **首页导航**：移除重复的 "Try AI Query" 按钮，保持单一主 CTA
+2. **Feature icons**：替换文字缩写为真实 SVG 图标（灯泡/代码/闪电）
+3. **Chart placeholder**：替换为模拟柱状图组件
+4. **Toast 组件**：替换 alert() 为可关闭的 toast 通知
+5. **TypeScript**：修复 Route 类型和变量引用顺序
+
+**验证结果**:
+
+- TypeScript: PASS (无错误)
+- ESLint: PASS (无警告)
+- HTTP Status: Homepage 200, Login 200
+- 开发服务器: http://localhost:3000 正常运行
