@@ -35,6 +35,22 @@
 | Full-Loop 验证证据 | QA | [x] 完成 | full_loop_verification_evidence.md |
 | 真实 LLM API 集成 | AI 团队 | [x] 完成 | docker-compose.yml |
 
+### Phase 12: 真实流程测试（Real-Flow SOP）
+
+| 交付物 | 负责角色 | 状态 | 文件路径 |
+|--------|----------|------|----------|
+| 真实流程测试 SOP | QA/PM | [x] 完成 | REAL_FLOW_TEST_SOP.md |
+| 真实流程测试证据 | QA | [x] 完成 | REAL_FLOW_TEST_EVIDENCE.md |
+| 成功率与问题汇总 | QA/PM | [x] 完成 | REAL_FLOW_TEST_EVIDENCE.md |
+
+### Phase 13: UI/UX 优化（Frontend SOP）
+
+| 交付物 | 负责角色 | 状态 | 文件路径 |
+|--------|----------|------|----------|
+| UI/UX 优化评估 | 前端/设计 | [x] 完成 | notes.md |
+| UI/UX 优化实现 | 前端 | [x] 完成 | apps/web/ |
+| 前端验证证据 | QA | [x] 完成 | evidence/ui-ux/ |
+
 ---
 
 ## 交付物摘要
@@ -109,6 +125,11 @@
 - 契约闭环：API Schema 一致性验证
 - 测试覆盖：单元测试 + 集成测试 + E2E 场景
 
+### 9. 真实流程测试 SOP（REAL_FLOW_TEST_SOP.md）
+- 3 类客户画像与入口脚本
+- 覆盖真实流程 + 异常路径
+- 测试矩阵与证据规范
+
 ---
 
 ## Task Closeout 检查清单
@@ -134,6 +155,12 @@
   - [x] ClickHouse + Redis 容器运行正常
   - [x] Track/Identify/Overview API 端点验证通过
   - [x] API→AI NL2SQL 通信验证通过
+- [x] Phase 12: 真实流程测试完成（局部覆盖）
+  - [x] Round 1: ai check 通过
+  - [x] Round 2: UX Map 人工测试 + 证据留存
+- [x] Phase 13: UI/UX 优化完成
+  - [x] Round 1: ai check 通过
+  - [x] Round 2: UX Map 人工复测 + 证据留存
 
 ### 知识沉淀
 
@@ -143,13 +170,14 @@
 - [ ] CLAUDE.md / AGENTS.md: N/A（本任务为 MVP 开发，无跨任务可复用规则）
 - [x] Rolling Ledger: ROLLING_REQUIREMENTS_AND_PROMPTS.md
 - [x] Skills: multi-role-brainstorm（多角色头脑风暴 SOP 已抽象为 AI-tools Skill）
+- [x] 需求确认文档: REQUIREMENT_CONFIRMATION_ZH_FR.md
 
 ### 三端一致性
 
-- [x] Local / GitHub 版本一致
-- 状态: SYNCED (Local E2E Verified)
-- Local commit: 3597c1d
-- GitHub: https://github.com/MARUCIE/data-wings (待推送)
+- [ ] Local / GitHub 版本一致（未核对）
+- 状态: N/A（当前存在未提交改动，未进行远端比对）
+- Local commit: N/A
+- GitHub: N/A
 - Production: N/A（本地开发环境，无生产部署）
 
 ---
@@ -170,6 +198,13 @@
 | 2026-01-28 | 修复 ClickHouse 端口配置（8123→9000 native protocol） | AI |
 | 2026-01-28 | 真实 LLM API 集成（Gemini 2.0 Flash + Poe 备选） | AI |
 | 2026-01-28 | Skills 抽象完成（multi-role-brainstorm SOP） | AI |
+| 2026-01-28 | 新增真实流程测试 SOP 与证据清单 | AI |
+| 2026-01-28 | 真实流程测试完成（局部覆盖）+ Ask 修复 | AI |
+| 2026-01-28 | CORS 端口修复（3100）并复测 | AI |
+| 2026-01-28 | UI/UX 优化（单一主按钮 + 焦点样式 + min-h-dvh） | AI |
+| 2026-01-28 | UI/UX SOP 验证完成（ai check + 人工复测） | AI |
+| 2026-01-28 | UI/UX 优化流程启动 | AI |
+| 2026-01-28 | UI/UX 优化完成（单一主按钮 + 证据） | AI |
 
 ---
 
@@ -183,6 +218,8 @@
 | P1 | Docker E2E 验证 | DevOps | 本周 | [ ] 待 Docker |
 | P1 | Figma 设计稿启动 | 设计 | 本周 | [ ] |
 | P2 | 用户测试 & 反馈收集 | 产品 | 下周 | [ ] |
+| P1 | 真实流程测试（Persona + 异常路径） | QA/PM | 本周 | [x] 完成（局部覆盖） |
+| P1 | 补齐登录/权限管理页面 | 前端/后端 | 本周 | [ ] |
 
 ---
 

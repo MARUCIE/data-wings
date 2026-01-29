@@ -28,6 +28,11 @@ type Config struct {
 	// CORS configuration
 	CORSOrigins []string
 
+	// Auth configuration
+	JWTSecret      string
+	JWTIssuer      string
+	JWTTTLMinutes  int
+
 	// Debug mode
 	Debug bool
 }
@@ -48,6 +53,10 @@ func Load() *Config {
 		AIServiceURL: getEnv("AI_SERVICE_URL", "http://localhost:8001"),
 
 		CORSOrigins: getEnvSlice("CORS_ORIGINS", []string{"http://localhost:3000"}),
+
+		JWTSecret:     getEnv("JWT_SECRET", "data-wings-dev-secret"),
+		JWTIssuer:     getEnv("JWT_ISSUER", "data-wings"),
+		JWTTTLMinutes: getEnvInt("JWT_TTL_MINUTES", 60),
 
 		Debug: getEnvBool("DEBUG", false),
 	}

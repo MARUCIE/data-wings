@@ -4,8 +4,9 @@
  * Handles all API communication with the backend services.
  */
 
+import { getAuthToken, type AuthUser, type UserRole } from "@/lib/auth";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-const AI_BASE_URL = process.env.NEXT_PUBLIC_AI_URL || "http://localhost:8001";
 
 /** Generic API response wrapper */
 interface ApiResponse<T> {
@@ -21,25 +22,58 @@ async function fetchApi<T>(
   options?: RequestInit
 ): Promise<ApiResponse<T>> {
   try {
+    const token = getAuthToken();
     const response = await fetch(url, {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options?.headers,
       },
     });
 
-    const data = await response.json();
+    const raw = await response.json();
 
     if (!response.ok) {
       return {
         status: "error",
-        message: data.message || `HTTP ${response.status}`,
-        error: data.error,
+        message: raw?.message || `HTTP ${response.status}`,
+        error: raw?.error,
       };
     }
 
-    return data;
+    if (raw && typeof raw === "object") {
+      if ("status" in raw) {
+        const payload = raw as Record<string, unknown> & {
+          status: ApiResponse<T>["status"];
+        };
+        const { status, ...rest } = payload;
+
+        if ("data" in rest) {
+          const { data, ...extras } = rest as { data: unknown } & Record<string, unknown>;
+          if (Object.keys(extras).length > 0) {
+            return {
+              status,
+              data: { ...extras, data } as T,
+            };
+          }
+          return {
+            status,
+            data: data as T,
+          };
+        }
+
+        return {
+          status,
+          data: rest as T,
+        };
+      }
+    }
+
+    return {
+      status: "ok",
+      data: raw as T,
+    };
   } catch (error) {
     return {
       status: "error",
@@ -70,6 +104,18 @@ export interface Widget {
     width: number;
     height: number;
   };
+}
+
+export interface AuthResponse {
+  token: string;
+  user: AuthUser;
+}
+
+export interface TeamMember {
+  id: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
 }
 
 /** Analytics types */
@@ -139,7 +185,7 @@ export const api = {
     async overview(
       startDate?: string,
       endDate?: string
-    ): Promise<ApiResponse<{ data: OverviewData }>> {
+    ): Promise<ApiResponse<OverviewData>> {
       const params = new URLSearchParams();
       if (startDate) params.set("start_date", startDate);
       if (endDate) params.set("end_date", endDate);
@@ -170,7 +216,7 @@ export const api = {
         }
       );
 
-      if (response.status === "error") {
+      if (response.status === "error" || !response.data) {
         return {
           question,
           sql: "",
@@ -180,7 +226,59 @@ export const api = {
         };
       }
 
-      return response as unknown as AskResponse;
+      return response.data as AskResponse;
+    },
+  },
+
+  /** Auth APIs */
+  auth: {
+    async login(
+      email: string,
+      password: string
+    ): Promise<ApiResponse<AuthResponse>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/auth/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+    },
+
+    async signup(
+      email: string,
+      password: string,
+      role: UserRole
+    ): Promise<ApiResponse<AuthResponse>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/auth/signup`, {
+        method: "POST",
+        body: JSON.stringify({ email, password, role }),
+      });
+    },
+
+    async me(): Promise<ApiResponse<{ user: AuthUser }>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/auth/me`);
+    },
+  },
+
+  /** Team APIs */
+  team: {
+    async list(): Promise<ApiResponse<{ members: TeamMember[] }>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/team`);
+    },
+
+    async create(payload: {
+      email: string;
+      password: string;
+      role: UserRole;
+    }): Promise<ApiResponse<{ member: TeamMember }>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/team`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+
+    async remove(id: string): Promise<ApiResponse<void>> {
+      return fetchApi(`${API_BASE_URL}/api/v1/team/${id}`, {
+        method: "DELETE",
+      });
     },
   },
 

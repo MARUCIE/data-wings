@@ -141,6 +141,29 @@ const dw = new DataWings({
 
 ## API 参考
 
+### 认证（JWT）
+
+```bash
+# 注册
+POST /api/v1/auth/signup
+{
+  "email": "admin@datawings.local",
+  "password": "datawings123",
+  "role": "admin"
+}
+
+# 登录
+POST /api/v1/auth/login
+{
+  "email": "admin@datawings.local",
+  "password": "datawings123"
+}
+
+# 获取当前用户（需 Authorization）
+GET /api/v1/auth/me
+Authorization: Bearer <token>
+```
+
 ### 事件追踪
 
 ```bash
@@ -176,6 +199,8 @@ POST /api/v1/identify
 ### 自然语言查询
 
 ```bash
+Authorization: Bearer <token>
+
 POST /api/v1/ask
 {
   "question": "过去7天的日活用户数是多少？"
@@ -194,22 +219,48 @@ POST /api/v1/ask
 
 ```bash
 # 获取数据概览
+Authorization: Bearer <token>
 GET /api/v1/overview
 
 # 列出仪表盘
+Authorization: Bearer <token>
 GET /api/v1/dashboards
 
 # 获取单个仪表盘
+Authorization: Bearer <token>
 GET /api/v1/dashboards/:id
 
 # 创建仪表盘
+Authorization: Bearer <token>
 POST /api/v1/dashboards
 
 # 更新仪表盘
+Authorization: Bearer <token>
 PUT /api/v1/dashboards/:id
 
 # 删除仪表盘
+Authorization: Bearer <token>
 DELETE /api/v1/dashboards/:id
+```
+
+### 团队管理（Admin）
+
+```bash
+Authorization: Bearer <token>
+
+# 成员列表
+GET /api/v1/team
+
+# 添加成员
+POST /api/v1/team
+{
+  "email": "analyst@datawings.local",
+  "password": "datawings123",
+  "role": "analyst"
+}
+
+# 移除成员
+DELETE /api/v1/team/:id
 ```
 
 ## 开发命令

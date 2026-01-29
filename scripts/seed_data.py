@@ -233,7 +233,7 @@ def generate_events(
                 "user_id": user_id,
                 "anonymous_id": anonymous_id,
                 "properties": json.dumps(event_type["properties"]()),
-                "page_url": f"https://app.datawings.io{random.choice(['/', '/dashboard', '/ask', '/settings'])}",
+                "page_url": f"https://app.datawings.io{random.choice(['/', '/app', '/app/ask', '/app/dashboards', '/app/settings/team'])}",
                 "page_title": "Data Wings",
                 "referrer": random.choice(["https://google.com", "https://twitter.com", ""]),
                 "device_type": device["type"],

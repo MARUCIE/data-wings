@@ -6,17 +6,41 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/MARUCIE/data-wings/services/api/internal/auth"
 )
+
+func setupAuth(t *testing.T, role auth.Role) (*auth.JWTManager, string) {
+	manager := auth.NewJWTManager("secret", "data-wings", time.Minute)
+	user := &auth.User{
+		ID:        "test-user",
+		Email:     "test@datawings.local",
+		Role:      role,
+		CreatedAt: time.Now(),
+	}
+	token, err := manager.Generate(user)
+	if err != nil {
+		t.Fatalf("generate token: %v", err)
+	}
+	return manager, token
+}
+
+func newAuthRequest(method, url string, body *bytes.Buffer, token string) *http.Request {
+	req, _ := http.NewRequest(method, url, body)
+	req.Header.Set("Authorization", "Bearer "+token)
+	return req
+}
 
 func TestDashboardHandler_List(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
 	router.GET("/api/v1/dashboards", handler.List)
 
-	req, _ := http.NewRequest("GET", "/api/v1/dashboards", nil)
+	req := newAuthRequest("GET", "/api/v1/dashboards", nil, token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -46,9 +70,11 @@ func TestDashboardHandler_Get_Default(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
 	router.GET("/api/v1/dashboards/:id", handler.Get)
 
-	req, _ := http.NewRequest("GET", "/api/v1/dashboards/default", nil)
+	req := newAuthRequest("GET", "/api/v1/dashboards/default", nil, token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -88,9 +114,11 @@ func TestDashboardHandler_Get_NotFound(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
 	router.GET("/api/v1/dashboards/:id", handler.Get)
 
-	req, _ := http.NewRequest("GET", "/api/v1/dashboards/nonexistent", nil)
+	req := newAuthRequest("GET", "/api/v1/dashboards/nonexistent", nil, token)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
@@ -103,7 +131,9 @@ func TestDashboardHandler_Create(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
-	router.POST("/api/v1/dashboards", handler.Create)
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
+	router.POST("/api/v1/dashboards", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), handler.Create)
 
 	body := map[string]interface{}{
 		"name":        "Test Dashboard",
@@ -112,7 +142,7 @@ func TestDashboardHandler_Create(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody))
+	req := newAuthRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody), token)
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -144,14 +174,16 @@ func TestDashboardHandler_Create_MissingName(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
-	router.POST("/api/v1/dashboards", handler.Create)
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
+	router.POST("/api/v1/dashboards", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), handler.Create)
 
 	body := map[string]interface{}{
 		"description": "A test dashboard without name",
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody))
+	req := newAuthRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody), token)
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -166,7 +198,9 @@ func TestDashboardHandler_Update(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
-	router.PUT("/api/v1/dashboards/:id", handler.Update)
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
+	router.PUT("/api/v1/dashboards/:id", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), handler.Update)
 
 	body := map[string]interface{}{
 		"name":        "Updated Overview",
@@ -175,7 +209,7 @@ func TestDashboardHandler_Update(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("PUT", "/api/v1/dashboards/default", bytes.NewBuffer(jsonBody))
+	req := newAuthRequest("PUT", "/api/v1/dashboards/default", bytes.NewBuffer(jsonBody), token)
 	req.Header.Set("Content-Type", "application/json")
 
 	w := httptest.NewRecorder()
@@ -203,9 +237,12 @@ func TestDashboardHandler_Delete(t *testing.T) {
 	router := setupTestRouter()
 	handler := NewDashboardHandler()
 
+	manager, token := setupAuth(t, auth.RoleAdmin)
+	router.Use(auth.AuthMiddleware(manager))
+
 	// First create a dashboard
-	router.POST("/api/v1/dashboards", handler.Create)
-	router.DELETE("/api/v1/dashboards/:id", handler.Delete)
+	router.POST("/api/v1/dashboards", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), handler.Create)
+	router.DELETE("/api/v1/dashboards/:id", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), handler.Delete)
 	router.GET("/api/v1/dashboards/:id", handler.Get)
 
 	// Create
@@ -213,7 +250,7 @@ func TestDashboardHandler_Delete(t *testing.T) {
 		"name": "To Delete",
 	}
 	jsonBody, _ := json.Marshal(createBody)
-	createReq, _ := http.NewRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody))
+	createReq := newAuthRequest("POST", "/api/v1/dashboards", bytes.NewBuffer(jsonBody), token)
 	createReq.Header.Set("Content-Type", "application/json")
 	createW := httptest.NewRecorder()
 	router.ServeHTTP(createW, createReq)
@@ -224,7 +261,7 @@ func TestDashboardHandler_Delete(t *testing.T) {
 	dashboardID := dashboard["id"].(string)
 
 	// Delete
-	deleteReq, _ := http.NewRequest("DELETE", "/api/v1/dashboards/"+dashboardID, nil)
+	deleteReq := newAuthRequest("DELETE", "/api/v1/dashboards/"+dashboardID, nil, token)
 	deleteW := httptest.NewRecorder()
 	router.ServeHTTP(deleteW, deleteReq)
 
@@ -233,7 +270,7 @@ func TestDashboardHandler_Delete(t *testing.T) {
 	}
 
 	// Verify deleted
-	getReq, _ := http.NewRequest("GET", "/api/v1/dashboards/"+dashboardID, nil)
+	getReq := newAuthRequest("GET", "/api/v1/dashboards/"+dashboardID, nil, token)
 	getW := httptest.NewRecorder()
 	router.ServeHTTP(getW, getReq)
 

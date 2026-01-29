@@ -1,7 +1,7 @@
 # Data Wings - 系统架构
 
 **版本**: v1.0
-**日期**: 2025-01-28
+**日期**: 2026-01-28
 **作者**: 架构师
 **PROJECT_DIR**: `/Users/mauricewen/Projects/09-data-wings`
 
@@ -18,6 +18,7 @@ Data Wings 是一个 **AI-Native 的开源数据分析平台**，核心能力包
 - 自动洞察生成
 - 预测分析
 - 可视化仪表盘
+- 登录与权限控制（RBAC）
 
 ### 1.2 架构原则
 
@@ -85,6 +86,7 @@ graph TB
     subgraph "应用服务层"
         AnalyticsAPI[Analytics API]
         DashboardAPI[Dashboard API]
+        AuthAPI[Auth API]
         UserAPI[User API]
         ExportAPI[Export API]
     end
@@ -114,6 +116,7 @@ graph TB
 
     ClickHouse --> AnalyticsAPI
     Redis --> AnalyticsAPI
+    AuthAPI --> UserAPI
     PostgreSQL --> UserAPI
 
     NL2SQL --> LLMRouter
@@ -432,7 +435,26 @@ OpenTelemetry SDK --> Collector --> Jaeger / Tempo
 
 ---
 
-## 9. 演进路线
+## 9. 质量门禁与真实流程测试
+
+**目标**: 以真实流程验证关键链路稳定性，并形成可审计证据闭环。
+
+**执行入口**:
+- SOP: `doc/00_project/initiative_data-wings/REAL_FLOW_TEST_SOP.md`
+- 证据: `doc/00_project/initiative_data-wings/REAL_FLOW_TEST_EVIDENCE.md`
+
+**覆盖范围**:
+- Web → API → AI → ClickHouse 端到端链路
+- 关键路径 + 异常路径（权限/数据/服务不可用）
+
+**验收门禁**:
+- Round 1: `ai check` 自动化验证通过
+- Round 2: UX Map 人工模拟测试完成并留证据
+- UI/UX: network / console / performance / visual regression 证据齐全
+
+---
+
+## 10. 演进路线
 
 ### Phase 1: MVP（Month 1-2）
 - Web SDK + Auto-Capture

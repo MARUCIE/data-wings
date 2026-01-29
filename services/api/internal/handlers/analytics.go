@@ -116,6 +116,15 @@ func (h *AnalyticsHandler) Ask(c *gin.Context) {
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"status":      "error",
+			"message":     "AI service error",
+			"status_code": resp.StatusCode,
+			"detail":      string(body),
+		})
+		return
+	}
 
 	var aiResp AskResponse
 	if err := json.Unmarshal(body, &aiResp); err != nil {

@@ -51,6 +51,33 @@
 | 交付物 | docker-compose.yml, .env.example |
 | 验收标准 | NL2SQL 返回正确 SQL，置信度 > 0.9 |
 
+### REQ-006: 多类型客户真实流程测试（Real-Flow SOP）
+| 字段 | 值 |
+|------|-----|
+| 需求描述 | 定义 3+ Persona，覆盖真实流程与异常路径，并留存证据 |
+| 提出日期 | 2026-01-28 |
+| 状态 | [x] 完成（局部覆盖） |
+| 交付物 | REAL_FLOW_TEST_SOP.md, REAL_FLOW_TEST_EVIDENCE.md |
+| 验收标准 | 关键路径成功率 ≥ 95%，异常路径提示准确，证据可审计 |
+
+### REQ-007: 前端 UI/UX 优化（SOP）
+| 字段 | 值 |
+|------|-----|
+| 需求描述 | 依据 ui-skills 与 web-interface-guidelines 优化 UI/UX |
+| 提出日期 | 2026-01-28 |
+| 状态 | [x] 完成 |
+| 交付物 | PRD.md, USER_EXPERIENCE_MAP.md, 证据截图 |
+| 验收标准 | 单一主按钮、层级清晰、验证证据齐全 |
+
+### REQ-008: 全量交付续航（Audit/Auth/Persona/Perf）
+| 字段 | 值 |
+|------|-----|
+| 需求描述 | 修复 audit FAIL/SKIP，补齐登录/权限/RBAC，并扩展 Persona 真实流程复测与前端性能/视觉证据 |
+| 提出日期 | 2026-01-28 |
+| 状态 | [ ] 进行中 |
+| 交付物 | PRD.md, SYSTEM_ARCHITECTURE.md, USER_EXPERIENCE_MAP.md, PLATFORM_OPTIMIZATION_PLAN.md, REAL_FLOW_TEST_EVIDENCE.md |
+| 验收标准 | audit 通过，/login+/app 路由可用，Persona 复测 ≥ 3 类，证据可审计 |
+
 ---
 
 ## 二、规划提示词库（Prompt Library）
@@ -106,6 +133,38 @@ Your task is to convert natural language questions into ClickHouse SQL queries.
 - NL2SQL 返回正确 SQL
 ```
 
+### PROMPT-004: Real-Flow Test Matrix
+```markdown
+## Objective
+Define a real-flow test matrix across personas and paths.
+
+## Template
+Persona | Entry | Device | Permission | Critical Path | Expected Result | Evidence
+
+## Rules
+1. Use real APIs and non-production environment
+2. Include at least one exception path per persona
+3. Record evidence for each critical step
+```
+
+### PROMPT-005: UI/UX Optimization Checklist
+```markdown
+## Objective
+Optimize UI/UX based on ui-skills and web-interface-guidelines.
+
+## Checklist
+1. Single primary CTA per page
+2. Clear spacing and typographic hierarchy
+3. Focus-visible and keyboard access
+4. Evidence for network/console/performance/visual
+```
+
+### PROMPT-006: Full Delivery Loop (Audit/Auth/Persona/Perf)
+```markdown
+## Objective
+Run supply audit, implement auth + RBAC with /app routes, extend persona real-flow tests, and capture network/console/performance/visual evidence.
+```
+
 ---
 
 ## 三、问题库（Anti-Regression Q&A）
@@ -127,6 +186,37 @@ Your task is to convert natural language questions into ClickHouse SQL queries.
 **根因**: Docker depends_on 只保证启动顺序，不保证就绪
 **修复**: 重启 API 容器或添加健康检查等待
 **防复发**: 使用 healthcheck + restart 策略
+
+### Q4: AI Ask 返回空结果 / 403 Forbidden
+**症状**: `/api/v1/ask` 返回空字段或 AI 端 403
+**根因**: Docker Compose 中硬编码的 Gemini API Key 失效
+**修复**: 使用环境变量注入真实 API Key，并重启 AI/API 服务
+**防复发**: 禁止在 compose 中写死密钥；统一从 `.env` 注入
+
+### Q5: Ask/Query 返回扫描错误（String → interface）
+**症状**: Ask/Query 返回 `failed to scan row: ... converting String to *interface {} is unsupported`
+**根因**: ClickHouse 驱动不支持扫描到 `*interface{}`，需要类型化扫描
+**修复**: 基于列类型创建目标变量，扫描后再组装 map
+**防复发**: Query 层统一类型化扫描
+
+### Q6: 前端端口变更导致 CORS 失败
+**症状**: Dashboard 页面提示 Retry/加载失败（CORS）
+**根因**: API 仅允许 `http://localhost:3000`，但实际前端运行在 3100
+**修复**: 在 `CORS_ORIGINS` 增加 `http://localhost:3100`
+**防复发**: 开发环境固定端口或统一配置 CORS_ORIGINS
+
+### Q7: 单页存在多个主按钮导致视觉层级混乱
+**症状**: 首页同时出现多个主色 CTA，层级不清晰
+**根因**: 导航与 Hero 同时使用主按钮样式
+**修复**: 保留一个主按钮，其余降级为次级样式
+**防复发**: UI Review 阶段校验单一主按钮规则
+
+### Q8: /app 路由访问未登录或权限不足
+**症状**: 未登录访问 /app 或权限不足访问 /app/settings/team
+**根因**: 缺少 auth middleware 或前端路由守卫
+**修复**: API JWT 校验 + RBAC 权限拦截 + 前端 AuthGate
+**验证**: 手工访问受限页面，期望 401/403 + 明确提示
+**防复发**: 新增 auth middleware 测试，更新 UX Map 复测脚本
 
 ---
 
@@ -151,6 +241,12 @@ Your task is to convert natural language questions into ClickHouse SQL queries.
 | 2026-01-28 | 添加 REQ-001 至 REQ-005 | AI |
 | 2026-01-28 | 添加问题库 Q1-Q3 | AI |
 | 2026-01-28 | 添加提示词库 PROMPT-001 至 PROMPT-003 | AI |
+| 2026-01-28 | 添加 REQ-006 与 PROMPT-004 | AI |
+| 2026-01-28 | 添加问题库 Q4-Q5（Real-Flow 测试发现） | AI |
+| 2026-01-28 | 添加问题库 Q6（CORS 端口问题） | AI |
+| 2026-01-28 | 添加 REQ-007 与 PROMPT-005 | AI |
+| 2026-01-28 | 添加问题库 Q7（主按钮层级） | AI |
+| 2026-01-28 | 添加 REQ-008 / PROMPT-006 / Q8 | AI |
 
 ---
 

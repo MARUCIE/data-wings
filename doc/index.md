@@ -17,8 +17,16 @@
 | `doc/00_project/initiative_data-wings/PRD.md` | 产品需求文档 |
 | `doc/00_project/initiative_data-wings/SYSTEM_ARCHITECTURE.md` | 系统架构 |
 | `doc/00_project/initiative_data-wings/USER_EXPERIENCE_MAP.md` | 用户体验地图 |
-| `doc/00_project/initiative_data-wings/SYSTEM_ARCHITECTURE.md` | 系统架构 |
 | `doc/00_project/initiative_data-wings/SEO_SITEMAP_STRATEGY.md` | SEO 策略 |
+| `doc/00_project/initiative_data-wings/index.md` | Initiative 索引 |
+| `doc/00_project/initiative_data-wings/PLATFORM_OPTIMIZATION_PLAN.md` | 平台优化计划 |
+| `doc/00_project/initiative_data-wings/EXECUTION_ROADMAP.md` | 执行路线图 |
+| `doc/00_project/initiative_data-wings/PDCA_EXECUTION_PLAN.md` | PDCA 执行计划 |
+| `doc/00_project/initiative_data-wings/PDCA_ITERATION_CHECKLIST.md` | PDCA 迭代检查表 |
+| `doc/00_project/initiative_data-wings/ROLLING_REQUIREMENTS_AND_PROMPTS.md` | 需求台账与提示词 |
+| `doc/00_project/initiative_data-wings/REAL_FLOW_TEST_SOP.md` | 真实流程测试 SOP |
+| `doc/00_project/initiative_data-wings/REAL_FLOW_TEST_EVIDENCE.md` | 真实流程测试证据 |
+| `doc/00_project/initiative_data-wings/REQUIREMENT_CONFIRMATION_ZH_FR.md` | 需求确认（中法对照） |
 <!-- AI-TOOLS:PATH-INDEX:END -->
 
 ---
@@ -33,9 +41,17 @@ doc/
         ├── task_plan.md               # 任务计划
         ├── notes.md                   # 研究笔记
         ├── deliverable.md             # 交付物
+        ├── index.md                   # Initiative 索引
         ├── PRD.md                     # 产品需求
         ├── SYSTEM_ARCHITECTURE.md     # 系统架构
         ├── USER_EXPERIENCE_MAP.md     # 用户体验地图
+        ├── PLATFORM_OPTIMIZATION_PLAN.md  # 平台优化计划
+        ├── EXECUTION_ROADMAP.md       # 执行路线图
+        ├── PDCA_EXECUTION_PLAN.md     # PDCA 执行计划
+        ├── PDCA_ITERATION_CHECKLIST.md # PDCA 迭代检查表
+        ├── REAL_FLOW_TEST_SOP.md      # 真实流程测试 SOP
+        ├── REAL_FLOW_TEST_EVIDENCE.md # 真实流程测试证据
+        ├── REQUIREMENT_CONFIRMATION_ZH_FR.md # 需求确认（中法对照）
         └── ROLLING_REQUIREMENTS_AND_PROMPTS.md  # 需求台账
 ```
 

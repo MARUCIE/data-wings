@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/MARUCIE/data-wings/services/api/internal/config"
+	"github.com/MARUCIE/data-wings/services/api/internal/auth"
 	"github.com/MARUCIE/data-wings/services/api/internal/handlers"
 	"github.com/MARUCIE/data-wings/services/api/internal/repository"
 	"github.com/gin-contrib/cors"
@@ -69,9 +70,21 @@ func main() {
 	// Dashboard handler (in-memory, always available)
 	dashboardHandler := handlers.NewDashboardHandler()
 
+	// Auth handlers
+	authStore := auth.NewStore()
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret, cfg.JWTIssuer, time.Duration(cfg.JWTTTLMinutes)*time.Minute)
+	authHandler := handlers.NewAuthHandler(authStore, jwtManager)
+	teamHandler := handlers.NewTeamHandler(authStore)
+	authMiddleware := auth.AuthMiddleware(jwtManager)
+
 	// API v1 routes
 	v1 := r.Group("/api/v1")
 	{
+		// Auth endpoints
+		v1.POST("/auth/signup", authHandler.Signup)
+		v1.POST("/auth/login", authHandler.Login)
+		v1.GET("/auth/me", authMiddleware, authHandler.Me)
+
 		// Event tracking endpoints
 		if eventHandler != nil {
 			v1.POST("/track", eventHandler.Track)
@@ -84,23 +97,34 @@ func main() {
 			v1.POST("/batch", degradedHandler("batch"))
 		}
 
-		// Analytics endpoints
+		// Analytics endpoints (auth required)
+		analyticsGroup := v1.Group("/")
+		analyticsGroup.Use(authMiddleware)
 		if analyticsHandler != nil {
-			v1.POST("/query", analyticsHandler.Query)
-			v1.POST("/ask", analyticsHandler.Ask)
-			v1.GET("/overview", analyticsHandler.GetOverview)
+			analyticsGroup.POST("/query", auth.RequireRoles(auth.RoleAdmin, auth.RoleAnalyst, auth.RolePM), analyticsHandler.Query)
+			analyticsGroup.POST("/ask", auth.RequireRoles(auth.RoleAdmin, auth.RoleAnalyst, auth.RolePM), analyticsHandler.Ask)
+			analyticsGroup.GET("/overview", analyticsHandler.GetOverview)
 		} else {
-			v1.POST("/query", degradedHandler("query"))
-			v1.POST("/ask", degradedHandler("ask"))
-			v1.GET("/overview", degradedHandler("overview"))
+			analyticsGroup.POST("/query", auth.RequireRoles(auth.RoleAdmin, auth.RoleAnalyst, auth.RolePM), degradedHandler("query"))
+			analyticsGroup.POST("/ask", auth.RequireRoles(auth.RoleAdmin, auth.RoleAnalyst, auth.RolePM), degradedHandler("ask"))
+			analyticsGroup.GET("/overview", degradedHandler("overview"))
 		}
 
-		// Dashboard endpoints (always available)
-		v1.GET("/dashboards", dashboardHandler.List)
-		v1.GET("/dashboards/:id", dashboardHandler.Get)
-		v1.POST("/dashboards", dashboardHandler.Create)
-		v1.PUT("/dashboards/:id", dashboardHandler.Update)
-		v1.DELETE("/dashboards/:id", dashboardHandler.Delete)
+		// Dashboard endpoints (auth required)
+		dashboardGroup := v1.Group("/dashboards")
+		dashboardGroup.Use(authMiddleware)
+		dashboardGroup.GET("", dashboardHandler.List)
+		dashboardGroup.GET("/:id", dashboardHandler.Get)
+		dashboardGroup.POST("", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), dashboardHandler.Create)
+		dashboardGroup.PUT("/:id", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), dashboardHandler.Update)
+		dashboardGroup.DELETE("/:id", auth.RequireRoles(auth.RoleAdmin, auth.RolePM), dashboardHandler.Delete)
+
+		// Team endpoints (admin only)
+		teamGroup := v1.Group("/team")
+		teamGroup.Use(authMiddleware, auth.RequireRoles(auth.RoleAdmin))
+		teamGroup.GET("", teamHandler.List)
+		teamGroup.POST("", teamHandler.Create)
+		teamGroup.DELETE("/:id", teamHandler.Delete)
 	}
 
 	// Create HTTP server

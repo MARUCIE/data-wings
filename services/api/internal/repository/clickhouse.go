@@ -3,8 +3,11 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
@@ -184,27 +187,144 @@ func (r *ClickHouseRepository) QueryEvents(ctx context.Context, sql string, args
 	defer rows.Close()
 
 	columns := rows.Columns()
+	columnTypes := rows.ColumnTypes()
 	results := make([]map[string]interface{}, 0)
 
 	for rows.Next() {
-		values := make([]interface{}, len(columns))
-		valuePtrs := make([]interface{}, len(columns))
-		for i := range values {
-			valuePtrs[i] = &values[i]
-		}
-
-		if err := rows.Scan(valuePtrs...); err != nil {
+		scanTargets := makeScanTargets(columnTypes, len(columns))
+		if err := rows.Scan(scanTargets...); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
 		row := make(map[string]interface{})
 		for i, col := range columns {
-			row[col] = values[i]
+			row[col] = normalizeScanValue(scanTargets[i])
 		}
 		results = append(results, row)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate rows: %w", err)
+	}
+
 	return results, nil
+}
+
+func makeScanTargets(columnTypes []driver.ColumnType, columnCount int) []interface{} {
+	targets := make([]interface{}, columnCount)
+	for i := 0; i < columnCount; i++ {
+		if len(columnTypes) > i {
+			targets[i] = newScanTarget(columnTypes[i])
+			continue
+		}
+		var fallback interface{}
+		targets[i] = &fallback
+	}
+	return targets
+}
+
+func newScanTarget(colType driver.ColumnType) interface{} {
+	if colType != nil {
+		if scanType := colType.ScanType(); scanType != nil {
+			if scanType.Kind() == reflect.Ptr {
+				return reflect.New(scanType.Elem()).Interface()
+			}
+			return reflect.New(scanType).Interface()
+		}
+		if name := colType.DatabaseTypeName(); name != "" {
+			return scanTargetByTypeName(name)
+		}
+	}
+	var fallback interface{}
+	return &fallback
+}
+
+func scanTargetByTypeName(name string) interface{} {
+	base := normalizeClickHouseType(name)
+	switch base {
+	case "String", "FixedString":
+		var v string
+		return &v
+	case "UInt8", "UInt16", "UInt32", "UInt64":
+		var v uint64
+		return &v
+	case "Int8", "Int16", "Int32", "Int64":
+		var v int64
+		return &v
+	case "Float32", "Float64":
+		var v float64
+		return &v
+	case "Date", "DateTime", "DateTime64":
+		var v time.Time
+		return &v
+	case "UUID":
+		var v uuid.UUID
+		return &v
+	default:
+		var v interface{}
+		return &v
+	}
+}
+
+func normalizeClickHouseType(name string) string {
+	clean := strings.TrimSpace(name)
+	for {
+		if strings.HasPrefix(clean, "Nullable(") && strings.HasSuffix(clean, ")") {
+			clean = strings.TrimSuffix(strings.TrimPrefix(clean, "Nullable("), ")")
+			continue
+		}
+		if strings.HasPrefix(clean, "LowCardinality(") && strings.HasSuffix(clean, ")") {
+			clean = strings.TrimSuffix(strings.TrimPrefix(clean, "LowCardinality("), ")")
+			continue
+		}
+		break
+	}
+	return clean
+}
+
+func normalizeScanValue(value interface{}) interface{} {
+	if value == nil {
+		return nil
+	}
+	val := reflect.ValueOf(value)
+	if val.Kind() == reflect.Ptr {
+		if val.IsNil() {
+			return nil
+		}
+		value = val.Elem().Interface()
+	}
+
+	switch v := value.(type) {
+	case sql.NullString:
+		if v.Valid {
+			return v.String
+		}
+		return nil
+	case sql.NullInt64:
+		if v.Valid {
+			return v.Int64
+		}
+		return nil
+	case sql.NullFloat64:
+		if v.Valid {
+			return v.Float64
+		}
+		return nil
+	case sql.NullBool:
+		if v.Valid {
+			return v.Bool
+		}
+		return nil
+	case sql.NullTime:
+		if v.Valid {
+			return v.Time
+		}
+		return nil
+	case []byte:
+		return string(v)
+	default:
+		return value
+	}
 }
 
 // GetDAU returns daily active users for a date range.

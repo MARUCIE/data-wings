@@ -79,9 +79,9 @@ app.datawings.io/
 │   ├── /insights/auto              # 自动洞察
 │   ├── /insights/alerts            # 告警
 │   └── /insights/predictions       # 预测
-├── /dashboards/                # 仪表盘
-│   ├── /dashboards/:id             # 仪表盘详情
-│   └── /dashboards/:id/edit        # 编辑
+├── /app/dashboards/                # 仪表盘
+│   ├── /app/dashboards/:id             # 仪表盘详情
+│   └── /app/dashboards/:id/edit        # 编辑
 ├── /data/                      # 数据管理
 │   ├── /data/events                # 事件管理
 │   ├── /data/properties            # 属性管理
