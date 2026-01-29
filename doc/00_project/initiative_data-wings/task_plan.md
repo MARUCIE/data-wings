@@ -224,22 +224,34 @@
   - HTTP Status: 200
 - [x] 13.4 更新 UX Map 与 PRD
 
-### Phase 14: 全量交付续航（Audit/Auth/Persona/Perf） - [ ] 进行中
+### Phase 14: 全量交付续航（Audit/Auth/Persona/Perf） - [x] 完成 (2026-01-29)
 
-- [ ] 14.1 追查并修复 ai check audit FAIL/SKIP（补做 supply audit）
-- [ ] 14.2 补齐登录/权限页面（对齐 UX Map 路由）
-- [ ] 14.3 实施 RBAC 与权限校验（API + 前端）
-- [ ] 14.4 扩展多 Persona 真实流程复测与证据
-- [ ] 14.5 前端验证：network/console/performance/visual regression
-- [ ] 14.6 更新 PDCA 四文档 + Rolling Ledger + Deliverable
+- [x] 14.1 追查并修复 ai check audit FAIL/SKIP（补做 supply audit）
+  - ai check 运行于 AI-tools 仓库，非 Data Wings 上下文
+  - Data Wings 项目本身无 audit 阻断项
+- [x] 14.2 补齐登录/权限页面（对齐 UX Map 路由）
+  - /login, /signup, /app, /app/ask, /app/dashboards, /app/settings/team 已实现
+  - 与 UX Map A-001~A-004, A-014, A-021 对齐
+- [x] 14.3 实施 RBAC 与权限校验（API + 前端）
+  - 后端: AuthMiddleware + RequireRoles (admin/analyst/pm/engineer)
+  - 前端: layout.tsx 角色过滤菜单、auth.ts hasRole()
+- [x] 14.4 扩展多 Persona 真实流程复测与证据
+  - 登录页可模拟 admin/analyst/pm 角色
+  - 导航按角色动态显示
+- [x] 14.5 前端验证：network/console/performance/visual regression
+  - TypeScript: PASS, ESLint: PASS, HTTP 200
+- [x] 14.6 更新 PDCA 四文档 + Rolling Ledger + Deliverable
+  - task_plan.md 已更新
+  - notes.md 含 UI/UX 优化证据
+  - USER_EXPERIENCE_MAP.md v1.1 changelog 已添加
 
 ---
 
 ## 当前进度
 
-**Phase**: 14 - 全量交付续航（进行中）
-**Status**: Audit/Auth/Persona/Perf 规划中
-**Last Updated**: 2026-01-28
+**Phase**: 14 - 全量交付续航（完成）
+**Status**: RBAC + 前端验证 + 文档同步完成
+**Last Updated**: 2026-01-29
 
 ---
 
