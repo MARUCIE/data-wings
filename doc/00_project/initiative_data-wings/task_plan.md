@@ -972,3 +972,11 @@
 - 本地/远端一致：`git rev-parse HEAD` == `git ls-remote origin master`
 - 证据：`outputs/sop-version-governance/5-2-dae6a322/logs/post-merge-status.log`
 
+
+- Hotfix：master CI Docker build 失败（`/app/public` not found）。修复：新增 `apps/web/public/.gitkeep`（commit: `3e7c2c7`）。
+- CI：run `21976067578` PASS（包含 Docker build web/api/ai）。
+- 证据：
+  - 失败日志：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-run-21975948868-log-failed.log`
+  - 本地 docker build：`outputs/sop-version-governance/5-2-dae6a322/logs/docker-build-web-local.log`
+  - CI watch：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-run-watch-master-ci-docker-fix.log`
+

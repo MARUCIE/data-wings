@@ -530,6 +530,8 @@
   - CI fix commit: `1dca263`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/git-commit-ci-fix.log`）
   - Push evidence (CI fix): `outputs/sop-version-governance/5-2-dae6a322/logs/git-push-after-ci-fix.log`
   - Merged PR: #1 -> `master` (squash), merge commit: `fccaf9b`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/post-merge-status.log`）
+  - Hotfix (master CI docker): commit `3e7c2c7`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-run-21975948868-log-failed.log` / `outputs/sop-version-governance/5-2-dae6a322/logs/gh-run-watch-master-ci-docker-fix.log`）
+
 
 
 
