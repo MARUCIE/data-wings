@@ -1416,3 +1416,11 @@
 
 - Updated: PRD/UX Map/PDCA/Platform plan to reference latest evidence runs (4.1/5.1/5.2/5.3)
 - Evidence: outputs/sop-version-governance/5-2-dae6a322/logs/doc-consistency-queue.log
+
+---
+
+### 2026-02-13 | Git closeout（branch: chore/release-gates-20260213）
+
+- commit: `37aa375` (`37aa3751c44fcd9f7bde34972fe41f7c41545ed4`)
+- pushed: `origin/chore/release-gates-20260213`
+- evidence: `outputs/sop-version-governance/5-2-dae6a322/logs/push-and-verify.log`

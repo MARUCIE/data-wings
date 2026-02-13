@@ -522,6 +522,9 @@
   - ai check Round 1: `outputs/sop-version-governance/5-2-dae6a322/logs/ai-check-round1.log`
   - UX Map Round 2: `outputs/sop-version-governance/5-2-dae6a322/reports/uxmap_e2e_probe.md`
   - Version + rollback: `outputs/sop-version-governance/5-2-dae6a322/reports/release_versioning_and_rollback.md`
+  - Git branch: `chore/release-gates-20260213`
+  - Git commit: `37aa375` (`37aa3751c44fcd9f7bde34972fe41f7c41545ed4`)
+  - Push evidence: `outputs/sop-version-governance/5-2-dae6a322/logs/push-and-verify.log`
 
 ### 10.x SOP 5.3 Postmortem 自动化守门（2026-02-13，run: 5-3-f13a8584）
 
