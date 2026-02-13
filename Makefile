@@ -1,7 +1,7 @@
 # Data Wings Development Makefile
 # Usage: make <target>
 
-.PHONY: help install dev build test lint clean docker-up docker-down seed
+.PHONY: help install setup dev dev-smoke dev-web dev-api dev-ai build test lint clean docker-up docker-down docker-logs docker-clean seed seed-clean sandbox-dry-run sandbox-task
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo ""
 	@echo "Development:"
 	@echo "  make dev         Start all services in dev mode"
+	@echo "  make dev-smoke   Smoke check (api+ai health)"
 	@echo "  make dev-web     Start frontend only"
 	@echo "  make dev-api     Start Go API only"
 	@echo "  make dev-ai      Start Python AI service only"
@@ -41,6 +42,10 @@ help:
 	@echo "  make lint        Run linters"
 	@echo "  make format      Format code"
 	@echo "  make clean       Clean build artifacts"
+	@echo ""
+	@echo "Sandbox:"
+	@echo "  make sandbox-dry-run TASK=docs-audit CMD='ls -la /workspace/doc'"
+	@echo "  make sandbox-task TASK=go-unit CMD='cd /workspace/services/api && go test ./...'"
 
 # =============================================================================
 # Setup
@@ -67,8 +72,12 @@ setup: install docker-up
 # =============================================================================
 
 dev:
-	@echo "Starting all services..."
-	pnpm dev
+	@echo "Starting all services (web + api + ai)..."
+	./scripts/dev_all.sh
+
+dev-smoke:
+	@echo "Running dev stack smoke (api+ai health)..."
+	./scripts/dev_all.sh --smoke --no-web
 
 dev-web:
 	@echo "Starting frontend..."
@@ -185,6 +194,24 @@ clean:
 	rm -rf services/ai/__pycache__
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -type d -delete
+
+# =============================================================================
+# Sandbox
+# =============================================================================
+
+sandbox-dry-run:
+	@if [ -z "$(TASK)" ] || [ -z "$(CMD)" ]; then \
+		echo "Usage: make sandbox-dry-run TASK=<task> CMD='<command>'"; \
+		exit 1; \
+	fi
+	./scripts/sandbox_task.sh --dry-run $(TASK) -- "$(CMD)"
+
+sandbox-task:
+	@if [ -z "$(TASK)" ] || [ -z "$(CMD)" ]; then \
+		echo "Usage: make sandbox-task TASK=<task> CMD='<command>'"; \
+		exit 1; \
+	fi
+	./scripts/sandbox_task.sh $(TASK) -- "$(CMD)"
 
 # =============================================================================
 # Release

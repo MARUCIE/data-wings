@@ -22,10 +22,10 @@ Data Wings 是一个 AI 驱动的数据统计分析平台，对标神策数据�
 ### 环境要求
 
 - Node.js >= 18
-- Go >= 1.21
-- Python >= 3.11
 - Docker & Docker Compose
-- pnpm >= 8
+- Go >= 1.22（本地模式：运行 API 服务）
+- Python >= 3.11（本地模式：运行 AI 服务）
+- pnpm >= 8（或使用 `npx pnpm`）
 
 ### 一键启动
 
@@ -41,18 +41,18 @@ make setup
 make install      # 安装所有依赖
 make docker-up    # 启动基础设施（ClickHouse, Redis）
 make seed         # 生成测试数据
-make dev          # 启动开发服务器
+make dev          # 启动开发服务器（本地模式；若未安装 Go 则自动回退 Docker Compose）
 ```
 
 ### 服务端口
 
-| 服务 | 端口 | 说明 |
-|------|------|------|
-| Web | 3000 | 前端应用 |
-| API | 8080 | Go API 服务 |
-| AI | 8000 | Python AI 服务 |
-| ClickHouse | 9000/8123 | 分析数据库 |
-| Redis | 6379 | 缓存 |
+| 服务 | 本地开发端口 | Docker Compose 暴露端口 | 说明 |
+|------|--------------|---------------------------|------|
+| Web | 3000 | 3009 | 前端应用 |
+| API | 8080 | 4009 | Go API 服务 |
+| AI | 8001 | 8009 | Python AI 服务 |
+| ClickHouse | 9000/8123 | 9000/8123 | 分析数据库 |
+| Redis | 6379 | 6309 | 缓存 |
 
 ### 配置 API Key
 
@@ -294,7 +294,50 @@ make seed-clean     # 清理并重新生成
 make release-patch  # 发布补丁版本
 make release-minor  # 发布次要版本
 make release-major  # 发布主要版本
+
+# 沙盒执行（隔离关键任务）
+make sandbox-dry-run TASK=docs-audit CMD='ls -la /workspace/doc'
+make sandbox-task TASK=go-unit CMD='cd /workspace/services/api && go test ./...'
 ```
+
+## 沙盒化执行（Global Sandbox）
+
+关键任务默认建议通过 `scripts/sandbox_task.sh` 执行，启用最小权限隔离：
+
+- 根文件系统只读（`--read-only`）
+- 默认禁网（`--network none`）
+- 限制 CPU / 内存 / 进程数 / 超时
+- 仅白名单路径可写（如 `outputs`、`.sandbox-tmp`、任务相关目录）
+
+示例：
+
+```bash
+# 文档审计：离线 + 最小可写路径
+scripts/sandbox_task.sh docs-audit -- "ls -la /workspace/doc"
+
+# 先查看策略，不实际执行
+scripts/sandbox_task.sh --dry-run web-lint -- "cd /workspace/apps/web && pnpm lint"
+```
+
+## 真实 API 回放与回归（No Mock）
+
+使用真实 API 生成并回放 fixtures：
+
+```bash
+# 启动非生产环境
+docker compose up -d web api ai clickhouse redis
+
+# 执行真实 API 核心路径并生成捕获报告
+python3 scripts/replay_real_api_fixture.py \
+  --fixture fixtures/replay/real_api/core_path.fixture.json \
+  --base-url http://localhost:4009 \
+  --capture-output outputs/replay/real_api_capture.json \
+  --report-output outputs/replay/real_api_capture.md
+```
+
+验收约束：
+- 最终验收必须通过真实 API。
+- 不得以 mock 响应替代核心路径验收。
 
 ## 文档索引
 
@@ -303,6 +346,7 @@ make release-major  # 发布主要版本
 | [PRD](doc/00_project/initiative_data-wings/PRD.md) | 产品需求文档 |
 | [UX Map](doc/00_project/initiative_data-wings/USER_EXPERIENCE_MAP.md) | 用户体验地图 |
 | [系统架构](doc/00_project/initiative_data-wings/SYSTEM_ARCHITECTURE.md) | 系统架构设计 |
+| [沙盒隔离策略](doc/00_project/initiative_data-wings/SANDBOX_ISOLATION_POLICY.md) | 全局沙盒运行与配额策略 |
 | [SEO 策略](doc/00_project/initiative_data-wings/SEO_SITEMAP_STRATEGY.md) | 网站地图与 SEO |
 | [竞品分析](doc/00_project/initiative_data-wings/notes.md) | 竞品调研笔记 |
 | [任务计划](doc/00_project/initiative_data-wings/task_plan.md) | 任务计划与决策记录 |

@@ -190,15 +190,15 @@ interface OverviewData {
 
 | Scenario | Steps | Expected | Status |
 |----------|-------|----------|--------|
-| Ask Question | Enter "How many events yesterday?" -> Submit | SQL + Results | PASS (API level) |
-| View Dashboard | Navigate to /dashboard | Metrics + Charts | NEEDS DOCKER |
+| Ask Question | Enter "How many events yesterday?" -> Submit | SQL + Results | PASS (SOP 3.7 / 4.1) |
+| View Dashboard | Navigate to /app/dashboards | Metrics + Charts | PASS (SOP 4.1) |
 | Clear Chat | Click "Clear chat" | Empty conversation | PASS (UI) |
 
-### 4.4 Pending Verifications (Require Docker)
+### 4.4 Docker/E2E Verifications
 
-- [ ] Full E2E with ClickHouse query execution
-- [ ] Dashboard with real seed data
-- [ ] SDK event tracking to ClickHouse
+- [x] Full E2E with ClickHouse query execution（证据：outputs/sop-full-loop-check/3-7-703f3d77/reports/system_loop_verification.md）
+- [x] Dashboard with real seed data（证据：outputs/sop-project-regression/4-1-6117de0a/reports/uxmap_e2e_probe.md）
+- [x] SDK event tracking to ClickHouse（证据：outputs/sop-full-loop-check/3-7-703f3d77/reports/real_api_capture.md）
 
 ---
 
@@ -210,11 +210,10 @@ interface OverviewData {
 |----|-------------|----------|--------|
 | I001 | `/api/v1/insights` returns TODO stub | Low | Known |
 | I002 | Frontend uses PORT 8080, AI config has 8001 | Info | By Design |
-| I003 | No auth/permission model implemented | Medium | MVP scope |
+| I003 | RBAC auth/permission model implemented (admin/analyst/pm/engineer) | Low | Fixed |
 
 ### 5.2 Missing Components for Production
 
-- Authentication & Authorization
 - Rate limiting
 - Audit logging
 - Error tracking (Sentry integration)
@@ -231,17 +230,19 @@ interface OverviewData {
 | API Contract | PASS | Schema consistent across services |
 | Unit Tests | PASS | Go + Python tests exist |
 | Integration Tests | PASS | LLM APIs verified |
-| E2E Tests | PARTIAL | Docker required for full verification |
+| E2E Tests | PASS | outputs/sop-project-regression/4-1-6117de0a/reports/uxmap_e2e_probe.md |
 
-**Overall Verdict**: MVP Implementation Complete (API Level)
+**Overall Verdict**: MVP Implementation Complete (Full Loop)
 
-**Next Steps for Full Verification**:
-1. Start Docker Desktop
-2. Run `./scripts/quickstart.sh`
-3. Execute E2E test with real ClickHouse queries
-4. Capture screenshots as visual evidence
+**Next Steps**:
+1. Local dev: `make dev` (web+api+ai)
+
+2. Docker dev: `docker compose up -d web api ai clickhouse redis`
+
+3. Regression evidence: prefer rerun SOP 4.1 / 5.1 and land outputs under `outputs/sop-*/`
+
 
 ---
 
 Verified by: Claude AI Assistant
-Date: 2026-01-28
+Date: 2026-02-12

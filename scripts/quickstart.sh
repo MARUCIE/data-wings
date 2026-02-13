@@ -65,6 +65,7 @@ check_command() {
 check_command node
 check_command python3
 check_command docker
+check_command curl
 
 if ! docker info &> /dev/null; then
     echo -e "${RED}Error: Docker daemon is not running${NC}"
@@ -96,8 +97,14 @@ echo "  Python: OK"
 
 # Go dependencies
 if [ -f "services/api/go.mod" ]; then
-    cd services/api && go mod download 2>/dev/null && cd ../..
-    echo "  Go: OK"
+    if command -v go &> /dev/null; then
+        (cd services/api && go mod download)
+        echo "  Go: OK"
+    else
+        # Best-effort fallback: use Docker Go toolchain when Go isn't installed.
+        docker run --rm -v "$PROJECT_ROOT/services/api:/app" -w /app golang:1.22 go mod download
+        echo "  Go: OK (via docker)"
+    fi
 fi
 
 echo ""
@@ -117,7 +124,7 @@ if [ "$SKIP_DOCKER" = false ]; then
     echo "  ClickHouse: OK"
 
     # Check Redis is ready
-    until redis-cli -h localhost ping 2>/dev/null | grep -q "PONG"; do
+    until docker compose exec -T redis redis-cli ping 2>/dev/null | grep -q "PONG"; do
         echo "  Waiting for Redis..."
         sleep 2
     done
@@ -227,23 +234,23 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo "Services:"
 echo "  ClickHouse: http://localhost:8123"
-echo "  Redis:      redis://localhost:6379"
+echo "  Redis:      redis://localhost:6309"
 echo ""
 echo "To start development servers:"
 echo "  make dev"
 echo ""
 echo "Or start individually:"
 echo "  # AI Service (NL2SQL)"
-echo "  cd services/ai && source .venv/bin/activate && uvicorn src.main:app --port 8000"
+echo "  cd services/ai && source .venv/bin/activate && uvicorn src.main:app --port 8001"
 echo ""
 echo "  # Go API"
-echo "  cd services/api && go run cmd/api/main.go"
+echo "  cd services/api && go run ./cmd/server"
 echo ""
 echo "  # Web App"
-echo "  cd apps/web && npm run dev"
+echo "  cd apps/web && pnpm dev"
 echo ""
 echo "Quick test NL2SQL:"
-echo "  curl -X POST http://localhost:8000/api/v1/ask \\"
+echo "  curl -X POST http://localhost:8001/api/v1/ask \\"
 echo "    -H 'Content-Type: application/json' \\"
 echo "    -d '{\"question\": \"How many events yesterday?\"}'"
 echo ""

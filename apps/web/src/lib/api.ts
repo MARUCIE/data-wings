@@ -14,6 +14,8 @@ interface ApiResponse<T> {
   data?: T;
   message?: string;
   error?: string;
+  error_code?: string;
+  details?: unknown;
 }
 
 /** Fetch wrapper with error handling */
@@ -37,8 +39,10 @@ async function fetchApi<T>(
     if (!response.ok) {
       return {
         status: "error",
-        message: raw?.message || `HTTP ${response.status}`,
-        error: raw?.error,
+        message: raw?.message || raw?.detail || `HTTP ${response.status}`,
+        error: raw?.error || raw?.detail,
+        error_code: raw?.error_code || `HTTP_${response.status}`,
+        details: raw,
       };
     }
 
@@ -78,6 +82,7 @@ async function fetchApi<T>(
     return {
       status: "error",
       message: error instanceof Error ? error.message : "Network error",
+      error_code: "NETWORK_ERROR",
     };
   }
 }

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/MARUCIE/data-wings/services/api/internal/repository"
+	"github.com/MARUCIE/data-wings/services/api/internal/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,28 +55,23 @@ type AskResponse struct {
 func (h *AnalyticsHandler) Query(c *gin.Context) {
 	var req QueryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "ANALYTICS_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
 	results, err := h.repo.QueryEvents(c.Request.Context(), req.SQL, req.Args...)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Query failed",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusInternalServerError, "ANALYTICS_QUERY_FAILED", "Query failed", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
-		"data":   results,
-		"count":  len(results),
+	response.OK(c, http.StatusOK, gin.H{
+		"data":  results,
+		"count": len(results),
 	})
 }
 
@@ -84,10 +80,8 @@ func (h *AnalyticsHandler) Query(c *gin.Context) {
 func (h *AnalyticsHandler) Ask(c *gin.Context) {
 	var req AskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "ANALYTICS_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -106,10 +100,8 @@ func (h *AnalyticsHandler) Ask(c *gin.Context) {
 		bytes.NewReader(aiBody),
 	)
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"status":  "error",
-			"message": "AI service unavailable",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusServiceUnavailable, "ANALYTICS_AI_SERVICE_UNAVAILABLE", "AI service unavailable", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -117,9 +109,7 @@ func (h *AnalyticsHandler) Ask(c *gin.Context) {
 
 	body, _ := io.ReadAll(resp.Body)
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"status":      "error",
-			"message":     "AI service error",
+		response.ErrorWithCode(c, http.StatusServiceUnavailable, "ANALYTICS_AI_SERVICE_ERROR", "AI service error", gin.H{
 			"status_code": resp.StatusCode,
 			"detail":      string(body),
 		})
@@ -128,10 +118,8 @@ func (h *AnalyticsHandler) Ask(c *gin.Context) {
 
 	var aiResp AskResponse
 	if err := json.Unmarshal(body, &aiResp); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Failed to parse AI response",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusInternalServerError, "ANALYTICS_AI_RESPONSE_PARSE_FAILED", "Failed to parse AI response", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -146,7 +134,9 @@ func (h *AnalyticsHandler) Ask(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, aiResp)
+	response.OK(c, http.StatusOK, gin.H{
+		"data": aiResp,
+	})
 }
 
 // GetOverview returns dashboard overview metrics.
@@ -175,8 +165,7 @@ func (h *AnalyticsHandler) GetOverview(c *gin.Context) {
 		eventCounts = []map[string]interface{}{}
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"data": gin.H{
 			"dau":          dau,
 			"event_counts": eventCounts,

@@ -42,6 +42,12 @@ export default function Home() {
               >
                 Sign in
               </Link>
+              <Link
+                href="/signup"
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              >
+                Create account
+              </Link>
             </nav>
           </div>
         </div>
@@ -67,10 +73,10 @@ export default function Home() {
               Try AI Query
             </Link>
             <Link
-              href="/app"
+              href="/signup"
               className="bg-white text-slate-900 px-8 py-3 rounded-lg text-lg font-medium border border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
-              Open App
+              Create account
             </Link>
           </div>
         </div>

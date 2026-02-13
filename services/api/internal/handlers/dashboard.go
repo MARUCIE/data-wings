@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/MARUCIE/data-wings/services/api/internal/response"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -116,8 +117,7 @@ func (h *DashboardHandler) List(c *gin.Context) {
 		dashboards = append(dashboards, d)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":     "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"dashboards": dashboards,
 	})
 }
@@ -129,15 +129,11 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 
 	dashboard, ok := h.dashboards[id]
 	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "Dashboard not found",
-		})
+		response.ErrorWithCode(c, http.StatusNotFound, "DASHBOARD_NOT_FOUND", "Dashboard not found", nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":    "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"dashboard": dashboard,
 	})
 }
@@ -154,10 +150,8 @@ type CreateRequest struct {
 func (h *DashboardHandler) Create(c *gin.Context) {
 	var req CreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "DASHBOARD_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -176,8 +170,7 @@ func (h *DashboardHandler) Create(c *gin.Context) {
 
 	h.dashboards[id] = dashboard
 
-	c.JSON(http.StatusCreated, gin.H{
-		"status":    "ok",
+	response.OK(c, http.StatusCreated, gin.H{
 		"dashboard": dashboard,
 	})
 }
@@ -189,19 +182,14 @@ func (h *DashboardHandler) Update(c *gin.Context) {
 
 	dashboard, ok := h.dashboards[id]
 	if !ok {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "Dashboard not found",
-		})
+		response.ErrorWithCode(c, http.StatusNotFound, "DASHBOARD_NOT_FOUND", "Dashboard not found", nil)
 		return
 	}
 
 	var req CreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "DASHBOARD_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -211,8 +199,7 @@ func (h *DashboardHandler) Update(c *gin.Context) {
 	dashboard.Widgets = req.Widgets
 	dashboard.UpdatedAt = time.Now()
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":    "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"dashboard": dashboard,
 	})
 }
@@ -223,17 +210,13 @@ func (h *DashboardHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if _, ok := h.dashboards[id]; !ok {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "Dashboard not found",
-		})
+		response.ErrorWithCode(c, http.StatusNotFound, "DASHBOARD_NOT_FOUND", "Dashboard not found", nil)
 		return
 	}
 
 	delete(h.dashboards, id)
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"message": "Dashboard deleted",
 	})
 }

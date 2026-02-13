@@ -1,20 +1,22 @@
 # Data Wings - Local Development Environment
 # Usage: docker compose up -d
 
-version: "3.8"
-
 services:
   # Frontend - Next.js Web App
   web:
+    container_name: 09-data-wings-web
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4009
+        NEXT_PUBLIC_AI_URL: http://localhost:8009
     ports:
-      - "3000:3000"
+      - "3009:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-      - NEXT_PUBLIC_AI_URL=http://localhost:8001
+      - NEXT_PUBLIC_API_URL=http://localhost:4009
+      - NEXT_PUBLIC_AI_URL=http://localhost:8009
     volumes:
       - ./apps/web/src:/app/src:ro
     depends_on:
@@ -23,18 +25,21 @@ services:
 
   # Backend - Go API Server
   api:
+    container_name: 09-data-wings-api
     build:
       context: ./services/api
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "4009:8080"
     environment:
       - PORT=8080
       - CLICKHOUSE_HOST=clickhouse
       - CLICKHOUSE_PORT=9000
+      - CLICKHOUSE_CONNECT_MAX_ATTEMPTS=15
+      - CLICKHOUSE_CONNECT_RETRY_DELAY_SECOND=2
       - REDIS_URL=redis://redis:6379/0
       - AI_SERVICE_URL=http://ai:8001
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:3100
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3009,http://localhost:3100
       - JWT_SECRET=${JWT_SECRET:-data-wings-dev-secret}
       - JWT_ISSUER=${JWT_ISSUER:-data-wings}
       - JWT_TTL_MINUTES=${JWT_TTL_MINUTES:-60}
@@ -44,11 +49,12 @@ services:
 
   # AI Service - Python NL2SQL
   ai:
+    container_name: 09-data-wings-ai
     build:
       context: ./services/ai
       dockerfile: Dockerfile
     ports:
-      - "8001:8001"
+      - "8009:8001"
     environment:
       # LLM Provider Priority: gemini > poe > deepseek > qwen > openai
       - DW_LLM_PROVIDER=${DW_LLM_PROVIDER:-gemini}
@@ -66,13 +72,14 @@ services:
       - DW_CLICKHOUSE_HOST=clickhouse
       - DW_CLICKHOUSE_PORT=9000
       - DW_REDIS_URL=redis://redis:6379/0
-      - DW_CORS_ORIGINS=["http://localhost:3000","http://localhost:3100"]
+      - DW_CORS_ORIGINS=["http://localhost:3000","http://localhost:3009","http://localhost:3100"]
     depends_on:
       - clickhouse
       - redis
 
   # ClickHouse - Analytics Database
   clickhouse:
+    container_name: 09-data-wings-clickhouse
     image: clickhouse/clickhouse-server:24.1
     ports:
       - "8123:8123"  # HTTP interface
@@ -91,9 +98,10 @@ services:
 
   # Redis - Cache and Queue
   redis:
+    container_name: 09-data-wings-redis
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "6309:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes

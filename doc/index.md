@@ -16,6 +16,13 @@
 | `doc/00_project/initiative_data-wings/deliverable.md` | 交付物清单 |
 | `doc/00_project/initiative_data-wings/PRD.md` | 产品需求文档 |
 | `doc/00_project/initiative_data-wings/SYSTEM_ARCHITECTURE.md` | 系统架构 |
+| `doc/00_project/initiative_data-wings/ADR-2026-02-11-architecture-council.md` | 架构决策记录（ADR） |
+| `doc/00_project/initiative_data-wings/ADR-2026-02-12-architecture-council-refresh.md` | 架构圆桌增量决策记录（ADR） |
+| `doc/00_project/initiative_data-wings/ADR-2026-02-12-multi-role-brainstorm.md` | 多角色头脑风暴决策记录（ADR） |
+| `doc/00_project/initiative_data-wings/ARCHITECTURE_RISK_REGISTER.md` | 架构风险清单 |
+| `doc/00_project/initiative_data-wings/SANDBOX_ISOLATION_POLICY.md` | 全局沙盒隔离策略 |
+| `fixtures/replay/real_api/core_path.fixture.json` | 真实 API 回放 fixture |
+| `scripts/replay_real_api_fixture.py` | 真实 API 回放执行器 |
 | `doc/00_project/initiative_data-wings/USER_EXPERIENCE_MAP.md` | 用户体验地图 |
 | `doc/00_project/initiative_data-wings/SEO_SITEMAP_STRATEGY.md` | SEO 策略 |
 | `doc/00_project/initiative_data-wings/index.md` | Initiative 索引 |
@@ -44,6 +51,11 @@ doc/
         ├── index.md                   # Initiative 索引
         ├── PRD.md                     # 产品需求
         ├── SYSTEM_ARCHITECTURE.md     # 系统架构
+        ├── ADR-2026-02-11-architecture-council.md # 架构决策记录
+        ├── ADR-2026-02-12-architecture-council-refresh.md # 架构圆桌增量决策记录
+        ├── ADR-2026-02-12-multi-role-brainstorm.md # 多角色头脑风暴决策记录
+        ├── ARCHITECTURE_RISK_REGISTER.md # 架构风险清单
+        ├── SANDBOX_ISOLATION_POLICY.md # 全局沙盒隔离策略
         ├── USER_EXPERIENCE_MAP.md     # 用户体验地图
         ├── PLATFORM_OPTIMIZATION_PLAN.md  # 平台优化计划
         ├── EXECUTION_ROADMAP.md       # 执行路线图

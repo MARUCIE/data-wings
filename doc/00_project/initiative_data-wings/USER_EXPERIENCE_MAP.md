@@ -1,7 +1,7 @@
 # Data Wings - 用户体验地图
 
-**版本**: v1.0
-**日期**: 2026-01-28
+**版本**: v1.6
+**日期**: 2026-02-12
 **作者**: UX 设计师
 **PROJECT_DIR**: `/Users/mauricewen/Projects/09-data-wings`
 
@@ -364,6 +364,9 @@ stateDiagram-v2
 **实现注记（MVP 现状）**:
 - 已对齐规划路由：`/login`、`/signup`、`/app`、`/app/ask`、`/app/dashboards`。
 - 真实流程测试按 `/app/*` 执行，并补齐权限拦截与登录流程证据。
+- 注册链路跨域基线：`http://localhost:3000` 与 `http://localhost:3009` 均必须可访问 `POST /api/v1/auth/signup`（避免 `Failed to fetch`）。
+- 容器侧体验稳定性基线：`web` 健康检查固定访问 `127.0.0.1:3000/api/health`，避免 `localhost` IPv6 误判。
+- 运行噪音基线：Compose v2 配置不声明顶层 `version`，减少诊断日志干扰。
 
 ### 6.3 真实流程测试对齐（Real-Flow SOP）
 
@@ -644,6 +647,173 @@ sequenceDiagram
 
 ---
 
+## 11. 基于 SOTA SOP 的体验地图增强（2026-02-11）
+
+### 11.1 旅程新增 Gate 节点
+
+将关键旅程从“线性体验”升级为“阶段验收体验”：
+
+1. `Plan Gate`: 需求定义与角色分工可见（Planner/Builder/Reviewer/Watchdog）。
+2. `Execution Gate`: 执行过程可追踪（操作日志、状态回写）。
+3. `Verification Gate`: contract/e2e/ai check 验证反馈可见。
+4. `Evidence Gate`: 证据自动归档并可导航查看。
+5. `Closeout Gate`: 风险与复盘项回写项目文档。
+
+### 11.2 角色体验要求（新增）
+
+| 角色 | 新增体验要求 |
+|------|------|
+| 分析师 | 能看到任务当前 gate 与失败原因（非黑盒） |
+| 产品经理 | 能查看 SOP 对比矩阵与质量指标趋势 |
+| 开发工程师 | 能从证据目录直接跳转到失败日志/回放报告 |
+| 管理者 | 能查看闭环完成率、回归逃逸率、证据完整率 |
+
+### 11.3 关键页面增强建议
+
+| 页面 | 增强项 |
+|------|------|
+| `/app` | 增加任务阶段看板（plan/execute/verify/evidence/closeout） |
+| `/app/ask` | 增加查询执行轨迹与失败可解释信息 |
+| `/app/dashboards` | 增加质量指标卡（success rate、regression rate） |
+| `/app/settings/team` | 增加角色策略模板与审批规则入口 |
+
+---
+
+## 12. 一键全量交付 Round 2 体验验收（SOP 1.1, 2026-02-12）
+
+### 12.1 人工模拟覆盖范围
+
+本轮按 UX Map 核心旅程执行真实浏览器探针：
+
+1. `/signup`
+2. `/app`
+3. `/app/ask`
+4. `/app/dashboards`
+5. `/app/settings/team`
+
+### 12.2 关键体验门禁结果
+
+| 维度 | 验收标准 | 结果 | 证据 |
+|------|------|------|------|
+| Onboarding | `/signup -> /app` 成功 | PASS | `reports/round2_uxmap_probe.json` |
+| 错误体验 | 无 `Failed to fetch` / `Signup failed` | PASS | `reports/round2_uxmap_probe.json` |
+| 导航连通 | 核心页面可达 | PASS（4/4） | `reports/round2_uxmap_probe.json` |
+| 控制台健康 | console/page 错误可追踪且为 0 | PASS | `reports/round2_uxmap_probe.json` |
+| 视觉证据 | 核心路径截图留存 | PASS | `screenshots/round2-*.png` |
+
+说明：证据路径位于 `outputs/sop-one-click-full-delivery/1-1-2ddd14fb/`。
+
+### 12.3 回归策略
+
+- 将该 Round 2 探针作为 UX Map 标准回归模板，后续版本按同路径复测。
+- 与 API 契约探针及 `ai check` 绑定，确保“体验门禁 + 工程门禁”同步通过。
+
+---
+
+## 13. 项目级 UX Map 回归结果（SOP 4.1, 2026-02-12）
+
+### 13.1 本轮路径
+
+`/ -> /signup -> /app -> /app/ask -> /app/dashboards -> /app/settings/team`
+
+### 13.2 验收结果
+
+| 验收项 | 结果 | 证据 |
+|------|------|------|
+| 首页入口可达 | PASS | `reports/uxmap_e2e_probe.json` |
+| 注册链路成功 | PASS (`201`, 无 `Failed to fetch`) | `reports/uxmap_e2e_probe.json` |
+| 核心页面连通 | PASS（4/4） | `reports/uxmap_e2e_probe.json` |
+| 体验稳定性 | PASS（console/page/network 错误均为 0） | `reports/uxmap_e2e_probe.json` |
+
+说明：证据目录为 `outputs/sop-project-regression/4-1-9c7e079a/`。
+
+---
+
+## 14. 联合验收 UX Map 门禁结果（SOP 5.1, 2026-02-12）
+
+### 14.1 验收路径
+
+`/ -> /signup -> /app -> /app/ask -> /app/dashboards -> /app/settings/team`
+
+### 14.2 体验门禁结论
+
+| 维度 | 结果 | 证据 |
+|------|------|------|
+| 首页入口与注册链路 | PASS | `reports/uxmap_e2e_probe.json` |
+| 核心页面连通（4/4） | PASS | `reports/uxmap_e2e_probe.json` |
+| 交互稳定性（console/page/network） | PASS（错误计数均为 0） | `reports/uxmap_e2e_probe.json` |
+| 联合验收归档 | PASS | `reports/joint_acceptance_release_gate.md` |
+
+说明：证据目录为 `outputs/sop-joint-acceptance/5-1-c1513579/`。
+
+---
+
+## 15. 一键全量交付重跑 UX 验收（SOP 1.1 rerun, 2026-02-12）
+
+### 15.1 验收路径
+
+`/ -> /signup -> /app -> /app/ask -> /app/dashboards -> /app/settings/team`
+
+### 15.2 验收结果
+
+| 验收项 | 结果 | 证据 |
+|------|------|------|
+| 首页入口与注册链路 | PASS | `reports/uxmap_e2e_probe.json` |
+| 核心页面连通（4/4） | PASS | `reports/uxmap_e2e_probe.json` |
+| 体验稳定性（console/page/network） | PASS（错误计数均为 0） | `reports/frontend_full_probe.json` |
+| 全量交付报告归档 | PASS | `reports/sop_1_1_full_delivery_report.md` |
+
+说明：证据目录为 `outputs/sop-one-click-full-delivery/1-1-719289f3/`。
+
+---
+
+## 16. 多角色头脑风暴 UX 共识（SOP 1.3, 2026-02-12）
+
+### 16.1 体验策略共识
+
+1. 维持核心路径单链路不变：`/ -> /signup -> /app -> /app/ask -> /app/dashboards -> /app/settings/team`。
+2. signup 成功后补充“下一步引导卡”，降低首次进入 `/app` 的认知负担。
+3. `/app/ask` 增加场景化示例问题分组（增长/留存/转化）。
+4. `/app/dashboards` 增加默认模板入口，减少空状态迷失。
+
+### 16.2 冲突与取舍
+
+| 冲突点 | 倾向 A | 倾向 B | 取舍结果 |
+|------|------|------|------|
+| 优先做新功能还是做引导体验 | 快速扩功能 | 强化激活与首屏可解释 | 优先做激活链路优化 |
+| 入口信息密度 | 首页放更多能力入口 | 保持 CTA 聚焦 | 保持 CTA 聚焦，入口不扩散 |
+
+### 16.3 验收门禁要求
+
+- 任何后续实现必须通过：
+  - `ai check`
+  - UX Map 路径回归
+  - API 契约探针
+
+## 17. 架构圆桌后的体验守门基线（SOP 1.4, 2026-02-12）
+
+### 17.1 保持不变的主路径
+
+`/ -> /signup -> /app -> /app/ask -> /app/dashboards -> /app/settings/team`
+
+### 17.2 体验层新增治理约束
+
+| 约束 | 目的 | 对体验的影响 |
+|------|------|------|
+| auth 速率限制（signup/login） | 降低暴力尝试与资源滥用 | 异常流量会被限制，但正常用户路径不变 |
+| API->AI 内部鉴权强化 | 避免内部调用滥用导致服务抖动 | 提高稳定性，减少不可解释失败 |
+| trace_id 贯通 | 提升故障定位效率 | 出错时可快速定位，缩短用户受影响时长 |
+| evidence retention 策略 | 控制日志与证据目录风险 | 保留必要审计证据，同时降低泄露面 |
+
+### 17.3 门禁要求
+
+- 发布前继续执行三门禁：
+  - `ai check`
+  - UX Map 路径回归
+  - API 契约探针
+
+---
+
 ## 附录
 
 ### A. 竞品参考
@@ -664,6 +834,18 @@ sequenceDiagram
 |------|------|----------|
 | 2026-01-28 | v1.0 | 初始版本 |
 | 2026-01-29 | v1.1 | UI/UX 优化：移除重复主按钮、替换 Chart placeholder、添加 Toast 组件、修复 TypeScript 类型 |
+| 2026-02-11 | v1.2 | 增加 SOTA SOP 驱动的 Gate 体验模型与角色增强要求 |
+| 2026-02-12 | v1.3 | 注册链路入口基线更新：3000/3009 双入口跨域可用，避免 signup `Failed to fetch` 回归 |
+| 2026-02-12 | v1.4 | 容器健康检查基线更新：web healthcheck 改为 IPv4 loopback，消除假性 unhealthy |
+| 2026-02-12 | v1.5 | Compose 配置基线更新：移除顶层 version，消除废弃告警噪音 |
+| 2026-02-12 | v1.6 | SOP 1.1 Round 2 体验验收落盘：核心旅程 5 点位验证通过并补齐 FE 证据链 |
+| 2026-02-12 | v1.7 | SOP 4.1 项目级回归验收落盘：从首页出发的 UX Map 核心链路全通过 |
+| 2026-02-12 | v1.8 | SOP 5.1 联合验收门禁落盘：发布前 UX Map 门禁与三方验收结果同步 |
+| 2026-02-12 | v1.9 | SOP 1.1 重跑验收落盘：UX 路径与 FE/BE 门禁在连续交付下再次通过 |
+| 2026-02-12 | v2.0 | SOP 1.3 多角色头脑风暴共识落盘：激活链路优先 + UX 引导策略定稿 |
+| 2026-02-12 | v2.1 | SOP 1.4 架构圆桌守门落盘：体验路径保持不变并补齐安全/可靠性治理约束 |
+| 2026-02-13 | v2.2 | SOP 4.1/5.1 证据刷新：run 4-1-9c7e079a + 5-1-c1513579 |
+| 2026-02-13 | v2.3 | 发布门禁增强：SOP 5.2 版本治理 + SOP 5.3 postmortem-scan CI gate |
 
 ---
 
