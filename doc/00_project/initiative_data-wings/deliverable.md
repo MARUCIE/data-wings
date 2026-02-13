@@ -529,6 +529,8 @@
   - CI run: `21975751118` PASS（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-pr-checks-watch-after-ci-fix.log`）
   - CI fix commit: `1dca263`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/git-commit-ci-fix.log`）
   - Push evidence (CI fix): `outputs/sop-version-governance/5-2-dae6a322/logs/git-push-after-ci-fix.log`
+  - Merged PR: #1 -> `master` (squash), merge commit: `fccaf9b`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/post-merge-status.log`）
+
 
 
 ### 10.x SOP 5.3 Postmortem 自动化守门（2026-02-13，run: 5-3-f13a8584）
