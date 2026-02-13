@@ -16,7 +16,7 @@ import httpx
 import structlog
 
 from .config import settings
-from .schema import CLICKHOUSE_SCHEMA, BUSINESS_GLOSSARY
+from .schema import BUSINESS_GLOSSARY, CLICKHOUSE_SCHEMA
 
 logger = structlog.get_logger()
 
@@ -148,7 +148,10 @@ Return ONLY valid JSON:
         if not parts:
             raise ValueError("No parts in Gemini response")
 
-        return parts[0].get("text", "")
+        raw_text = parts[0].get("text", "")
+        if not isinstance(raw_text, str):
+            raise ValueError("Gemini response part text is not a string")
+        return raw_text
 
     async def _call_poe(self, system_prompt: str, user_prompt: str) -> str:
         """Call Poe API (OpenAI-compatible)."""
@@ -165,7 +168,10 @@ Return ONLY valid JSON:
             },
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        raw_content = response.json()["choices"][0]["message"]["content"]
+        if not isinstance(raw_content, str):
+            raise ValueError("LLM response content is not a string")
+        return raw_content
 
     async def _call_deepseek(self, system_prompt: str, user_prompt: str) -> str:
         """Call DeepSeek API."""
@@ -183,7 +189,10 @@ Return ONLY valid JSON:
             },
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        raw_content = response.json()["choices"][0]["message"]["content"]
+        if not isinstance(raw_content, str):
+            raise ValueError("LLM response content is not a string")
+        return raw_content
 
     async def _call_qwen(self, system_prompt: str, user_prompt: str) -> str:
         """Call Qwen API (via DashScope compatible mode)."""
@@ -200,7 +209,10 @@ Return ONLY valid JSON:
             },
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        raw_content = response.json()["choices"][0]["message"]["content"]
+        if not isinstance(raw_content, str):
+            raise ValueError("LLM response content is not a string")
+        return raw_content
 
     async def _call_openai(self, system_prompt: str, user_prompt: str) -> str:
         """Call OpenAI API."""
@@ -218,7 +230,10 @@ Return ONLY valid JSON:
             },
         )
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        raw_content = response.json()["choices"][0]["message"]["content"]
+        if not isinstance(raw_content, str):
+            raise ValueError("LLM response content is not a string")
+        return raw_content
 
     def _parse_response(self, response: str) -> dict[str, Any]:
         """Parse LLM response into structured result."""

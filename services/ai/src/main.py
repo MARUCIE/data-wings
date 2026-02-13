@@ -8,8 +8,9 @@ This service provides:
 - Query optimization suggestions
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any
 
 import structlog
 from fastapi import FastAPI, HTTPException
@@ -53,7 +54,7 @@ class AskRequest(BaseModel):
     """Natural language query request."""
 
     question: str
-    context: dict | None = None
+    context: dict[str, Any] | None = None
 
 
 class AskResponse(BaseModel):
@@ -63,7 +64,7 @@ class AskResponse(BaseModel):
     sql: str
     explanation: str
     confidence: float
-    data: list[dict] | None = None
+    data: list[dict[str, Any]] | None = None
     error: str | None = None
 
 
@@ -81,12 +82,12 @@ class InsightResponse(BaseModel):
     metric: str
     summary: str
     trend: str
-    anomalies: list[dict]
+    anomalies: list[dict[str, Any]]
     recommendations: list[str]
 
 
 @app.get("/health")
-async def health_check() -> dict:
+async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {
         "status": "ok",

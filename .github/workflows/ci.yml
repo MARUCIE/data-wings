@@ -32,14 +32,21 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
+      - name: Ensure pnpm store path exists
+        run: |
+          mkdir -p "$(pnpm store path)"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
 
-      - name: Type check
-        run: pnpm exec tsc --noEmit
+      - name: Type check (web)
+        run: pnpm exec tsc --noEmit -p apps/web/tsconfig.json
+
+      - name: Type check (sdk)
+        run: pnpm exec tsc --noEmit -p packages/sdk/tsconfig.json
 
   # Test JavaScript/TypeScript packages
   test-js:
@@ -153,6 +160,10 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
+
+      - name: Ensure pnpm store path exists
+        run: |
+          mkdir -p "$(pnpm store path)"
 
       - name: pnpm audit (json)
         run: |

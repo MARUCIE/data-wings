@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from src.config import settings
 from src.nl2sql import NL2SQLEngine
 
 
@@ -27,7 +28,8 @@ class TestNL2SQLEngine:
     def test_init(self, engine):
         """Test engine initialization."""
         assert engine is not None
-        assert engine.provider == "deepseek"
+        assert engine.provider in {"gemini", "poe", "deepseek", "qwen", "openai"}
+        assert engine.provider == settings.llm_provider
 
     def test_parse_response_valid_json(self, engine):
         """Test parsing valid JSON response."""

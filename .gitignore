@@ -54,3 +54,6 @@ credentials/
 outputs/
 test-results/
 
+
+# Test/coverage reports
+coverage.xml
