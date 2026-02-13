@@ -525,6 +525,11 @@
   - Git branch: `chore/release-gates-20260213`
   - Git commit: `37aa375` (`37aa3751c44fcd9f7bde34972fe41f7c41545ed4`)
   - Push evidence: `outputs/sop-version-governance/5-2-dae6a322/logs/push-and-verify.log`
+  - PR: #1（branch: `chore/release-gates-20260213`）
+  - CI run: `21975751118` PASS（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-pr-checks-watch-after-ci-fix.log`）
+  - CI fix commit: `1dca263`（证据：`outputs/sop-version-governance/5-2-dae6a322/logs/git-commit-ci-fix.log`）
+  - Push evidence (CI fix): `outputs/sop-version-governance/5-2-dae6a322/logs/git-push-after-ci-fix.log`
+
 
 ### 10.x SOP 5.3 Postmortem 自动化守门（2026-02-13，run: 5-3-f13a8584）
 

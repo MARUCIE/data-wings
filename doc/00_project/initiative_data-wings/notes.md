@@ -1424,3 +1424,23 @@
 - commit: `37aa375` (`37aa3751c44fcd9f7bde34972fe41f7c41545ed4`)
 - pushed: `origin/chore/release-gates-20260213`
 - evidence: `outputs/sop-version-governance/5-2-dae6a322/logs/push-and-verify.log`
+
+---
+
+### 2026-02-13 | PR CI 复绿（PR #1，run: 5-2-dae6a322）
+
+- 背景：PR 初次 CI 失败（tsc root help / vitest 无测试文件退出码 / ruff+import / pnpm cache store path 缺失）。
+- 修复（commit: `1dca263`）：
+  - `.github/workflows/ci.yml`：TypeScript typecheck 改为按 `apps/web` 与 `packages/sdk` 的 `tsconfig.json`；Supply Chain job 补齐 pnpm store path 创建。
+  - `apps/web/package.json` / `packages/sdk/package.json`：`test` 改为 `vitest run --passWithNoTests`。
+  - `services/ai`：mypy strict 类型修复 + NL2SQL provider 测试不再硬编码具体 provider。
+  - `.gitignore`：忽略 `coverage.xml`。
+- 结果：GitHub Actions run `21975751118` 全绿（Build PASS；Docker job skipping 非 master）。
+- 证据：
+  - 失败日志：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-run-21975188069-log-failed.log`
+  - 本地验证：`outputs/sop-version-governance/5-2-dae6a322/logs/local-node-verify-after-ci-fix.log` / `outputs/sop-version-governance/5-2-dae6a322/logs/local-python-mypy-ruff-recheck-2.log` / `outputs/sop-version-governance/5-2-dae6a322/logs/local-python-pytest-ci-like-env.log`
+  - ai check：`outputs/sop-version-governance/5-2-dae6a322/logs/ai-check-after-ci-fix.log`
+  - commit：`outputs/sop-version-governance/5-2-dae6a322/logs/git-commit-ci-fix.log`
+  - push：`outputs/sop-version-governance/5-2-dae6a322/logs/git-push-after-ci-fix.log`
+  - PR checks：`outputs/sop-version-governance/5-2-dae6a322/logs/gh-pr-checks-watch-after-ci-fix.log`
+
