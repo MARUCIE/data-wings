@@ -528,6 +528,7 @@ Data Wings 致力于成为 AI-Native 的开源数据分析平台，通过自然�
 - 覆盖“入口 → 任务 → 结果”全链路与异常路径
 - 必须使用真实 API/真实账号（禁止 mock）
 - 必须留存可审计证据（截图/日志/请求）
+- 注册链路必须覆盖多入口验证：`http://localhost:3000` 与 `http://localhost:3009` 均可完成 `/signup -> /api/v1/auth/signup`
 
 ### 9.2 验收标准（AC）
 
@@ -535,6 +536,9 @@ Data Wings 致力于成为 AI-Native 的开源数据分析平台，通过自然�
 2. 异常路径提示准确、可恢复
 3. 证据归档到 `REAL_FLOW_TEST_EVIDENCE.md`
 4. 复测通过后更新 PRD 与 UX Map
+5. `Origin:3000/3009` 对 `POST /api/v1/auth/signup` 预检均返回 `204`，创建账号返回 `201`
+6. Docker `web` 服务健康检查稳定为 `healthy`（`/api/health` 连续检查通过）
+7. `docker compose` 常用命令（`ps/config/up`）不再输出 `version` 废弃告警
 
 ### 9.3 UI/UX 优化要求
 
@@ -544,6 +548,201 @@ Data Wings 致力于成为 AI-Native 的开源数据分析平台，通过自然�
 - 前端验证必须包含 network / console / performance / visual regression 证据
 
 ---
+
+## 10. SOTA SOP 基准后的产品化要求（2026-02-11）
+
+### 10.1 目标
+
+对齐近 12 个月全球 SOTA 平台在“流程工程化”上的共同实践，将 Data Wings 的交付体系从“功能实现”升级为“可治理 SOP 系统”。
+
+### 10.2 新增需求（P0/P1）
+
+| 优先级 | 需求 | 验收标准 |
+|------|------|------|
+| P0 | SOP 状态机标准化（plan/execute/verify/evidence/closeout） | 任一任务均可追踪到状态与证据路径 |
+| P0 | 质量门禁统一化（contract/e2e/ai check + supply-chain + postmortem-scan） | 未过 gate 任务不可标记完成 |
+| P0 | 证据目录标准化（outputs/<sop-id>/<run-id>/） | logs/reports/diff/screenshot 结构完整 |
+| P1 | 角色模板化（Planner/Builder/Reviewer/Watchdog） | complex 任务强制角色分工 |
+| P1 | 评测与观测（eval/tracing） | 输出通过率、回归率、重试轨迹等指标 |
+
+### 10.3 新增非功能指标
+
+| 指标 | 目标值 | 说明 |
+|------|------|------|
+| SOP 闭环完成率 | >= 95% | 完整覆盖 5 个阶段 |
+| 质量门禁命中率 | 100% | 每次交付必须存在门禁证据 |
+| 回归逃逸率 | < 2% | 发布后 P0/P1 回归问题占比 |
+| 证据完整率 | 100% | 结构化证据目录齐全 |
+| 任务可复现率 | >= 90% | 使用 fixture/replay 可复跑 |
+
+### 10.4 风险与约束
+
+| 风险 | 应对策略 |
+|------|------|
+| 流程过度复杂导致交付变慢 | 任务复杂度分层（simple/medium/complex） |
+| 门禁流于形式 | 强制 machine-readable 报告 + 自动校验 |
+| 多代理冲突 | complex 任务默认 Watchdog 或 Pipeline |
+
+---
+
+## 11. 一键全量交付验收基线（SOP 1.1, 2026-02-12）
+
+### 11.1 目标
+
+将“功能可用”升级为“可审计闭环完成”：
+
+1. 所有步骤（plan-first -> verify -> closeout）必须落盘。
+2. Round 1 与 Round 2 必须同时通过。
+3. 前后端入口、契约、错误码、CORS 基线必须一致。
+
+### 11.2 验收门禁（新增）
+
+| Gate | 必要证据 | 通过标准 |
+|------|------|------|
+| Round 1 | `ai check` 日志 | `OK: ai check 通过` |
+| Round 2（FE） | 浏览器探针 JSON + 截图 | `/signup -> /app` 成功，`Failed to fetch=0`，核心路由可达 |
+| Round 2（BE） | 真实 API 回放 + 契约探针 | 核心路径 7/7，错误码契约 6/6 |
+| Closeout | deliverable + rolling ledger + notes | 证据路径与结论可追踪 |
+
+### 11.3 本轮结果（run: 1-1-2ddd14fb）
+
+- Round 1：通过（`outputs/sop-one-click-full-delivery/1-1-2ddd14fb/logs/ai-check-round1.log`）
+- Round 2（FE）：通过（`outputs/sop-one-click-full-delivery/1-1-2ddd14fb/reports/round2_uxmap_probe.json`）
+- Round 2（BE）：通过（`outputs/sop-one-click-full-delivery/1-1-2ddd14fb/reports/backend_contract_probe.json`）
+- 全量交付总报告：`outputs/sop-one-click-full-delivery/1-1-2ddd14fb/reports/sop_1_1_full_delivery_report.md`
+
+---
+
+## 12. 项目级全链路回归验收基线（SOP 4.1, 2026-02-12）
+
+### 12.1 验收目标
+
+在项目级别验证“首页入口 -> UX Map 核心路径 -> API 契约 -> 回归门禁”持续成立。
+
+### 12.2 本轮结果（证据刷新，run: 4-1-9c7e079a，2026-02-13）
+
+- UX Map Round 2 探针通过（首页 + 注册 + 核心路径）：
+  - `outputs/sop-project-regression/4-1-9c7e079a/reports/uxmap_e2e_probe.json`
+- 真实 API 回放通过（7/7）：
+  - `outputs/sop-project-regression/4-1-9c7e079a/reports/real_api_capture.md`
+- 契约探针通过（6/6）：
+  - `outputs/sop-project-regression/4-1-9c7e079a/reports/backend_contract_probe.md`
+- Round 1 门禁通过：
+  - `outputs/sop-project-regression/4-1-9c7e079a/logs/ai-check.log`
+
+---
+
+## 13. 联合验收与发布守门基线（SOP 5.1, 2026-02-12）
+
+### 13.1 验收目标
+
+在发布前由产品/技术/质量三方联合验收，确保“双轮门禁 + 证据完备”成立后才允许进入发布流程。
+
+### 13.2 本轮结果（证据刷新，run: 5-1-c1513579，2026-02-13）
+
+- 联合验收报告：
+  - `outputs/sop-joint-acceptance/5-1-c1513579/reports/joint_acceptance_release_gate.md`
+- Round 1（`ai check`）通过：
+  - `outputs/sop-joint-acceptance/5-1-c1513579/logs/ai-check-round1.log`
+- Round 2（UX Map）通过：
+  - `outputs/sop-joint-acceptance/5-1-c1513579/reports/uxmap_e2e_probe.md`
+- Round 2（真实 API + 契约探针）通过：
+  - `outputs/sop-joint-acceptance/5-1-c1513579/reports/real_api_capture.md`
+  - `outputs/sop-joint-acceptance/5-1-c1513579/reports/backend_contract_probe.md`
+
+### 13.3 守门结论
+
+发布前联合验收门禁在当前迭代首轮通过，未触发 ralph loop。
+
+---
+
+### 13.4 版本治理与回滚基线（SOP 5.2, 2026-02-13）
+
+- Version + rollback 报告：
+  - `outputs/sop-version-governance/5-2-dae6a322/reports/release_versioning_and_rollback.md`
+- Round 1（`ai check`）：
+  - `outputs/sop-version-governance/5-2-dae6a322/logs/ai-check-round1.log`
+- Round 2（UX Map）：
+  - `outputs/sop-version-governance/5-2-dae6a322/reports/uxmap_e2e_probe.md`
+
+### 13.5 Postmortem 自动化守门基线（SOP 5.3, 2026-02-13）
+
+- Postmortems：`postmortem/PM-*.md`（machine-readable triggers：path/keyword/regex）
+- Pre-release scan：`outputs/sop-postmortem/5-3-f13a8584/reports/pre_release_scan.json`
+- CI Gate：`.github/workflows/ci.yml` 新增 `postmortem-scan` job（命中 open trigger 直接阻塞 merge/release）
+
+
+## 14. 一键全量交付重跑验收基线（SOP 1.1 rerun, 2026-02-12）
+
+### 14.1 验收目标
+
+在不引入新需求的前提下，对当前基线执行完整 SOP 1.1 重跑，验证持续交付稳定性与证据可复用性。
+
+### 14.2 本轮结果（run: 1-1-719289f3）
+
+- Round 1 通过：
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/logs/ai-check-round1.log`
+- Round 2 UX Map 通过：
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/reports/uxmap_e2e_probe.json`
+- FE 专项通过：
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/reports/frontend_full_probe.json`
+- BE 专项通过：
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/reports/real_api_capture.json`
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/reports/backend_contract_probe.json`
+- Closeout 报告：
+  - `outputs/sop-one-click-full-delivery/1-1-719289f3/reports/sop_1_1_full_delivery_report.md`
+
+### 14.3 结论
+
+重跑验证通过，当前版本满足“可重复交付 + 可审计证据”要求。
+
+---
+
+## 15. 多角色头脑风暴增量决策（SOP 1.3, 2026-02-12）
+
+### 15.1 目标
+
+通过 Council 模式收敛 PM / Designer / SEO 的关键分歧，形成“可执行且低回归风险”的产品增量方向。
+
+### 15.2 PM 产出（竞品分析 + PRD 结论）
+
+| 方向 | 对标洞察 | 本轮 PRD 决策 |
+|------|------|------|
+| 激活漏斗 | Amplitude/Mixpanel 在激活与留存模板上成熟 | 新增激活漏斗模板优先级（先模板后扩功能） |
+| 开源转化 | PostHog 的开源转化链路清晰 | 增加开源入口与产品内 GitHub 引导 |
+| 行业模板 | 国内竞品行业化模板覆盖更广 | 增补 3 个行业模板（电商/SaaS/内容） |
+
+### 15.3 角色冲突与决策
+
+- 冲突 1：先扩功能还是先优化激活链路。
+- 冲突 2：SEO 优先博客还是优先产品页。
+- 冲突 3：是否同步提升权限复杂度。
+
+决策：
+
+1. 先优化激活链路与默认模板入口，功能扩展后置。
+2. SEO 采用“产品页优先，内容页补位”。
+3. 本轮不变更权限模型，仅强化可观测与测试门禁。
+
+### 15.4 证据
+
+- `outputs/sop-multi-role-brainstorm/1-3-670e1dcd/reports/multi_role_brainstorm_report.md`
+- `doc/00_project/initiative_data-wings/ADR-2026-02-12-multi-role-brainstorm.md`
+
+---
+
+## 16. 架构圆桌产品约束（SOP 1.4, 2026-02-12）
+
+### 16.1 产品层结论
+
+1. 本轮不扩系统边界，优先做低风险增量（激活链路/模板入口）。
+2. 安全与可靠性改进以“门禁不降级”为前提推进。
+3. 后续功能实施需先满足 auth 限流与内部鉴权治理计划。
+
+### 16.2 决策依据
+
+- `outputs/sop-architecture-council/1-4-cdf0f11e/reports/architecture_council_report.md`
+- `doc/00_project/initiative_data-wings/ADR-2026-02-12-architecture-council-refresh.md`
 
 ## 附录
 

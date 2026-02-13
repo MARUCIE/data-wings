@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,7 +27,7 @@ func setupAuth(t *testing.T, role auth.Role) (*auth.JWTManager, string) {
 	return manager, token
 }
 
-func newAuthRequest(method, url string, body *bytes.Buffer, token string) *http.Request {
+func newAuthRequest(method, url string, body io.Reader, token string) *http.Request {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Set("Authorization", "Bearer "+token)
 	return req

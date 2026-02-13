@@ -517,6 +517,37 @@ datawings.io/ja/           # 日语
 
 ---
 
+## 8. SOP 1.3 多角色头脑风暴增量策略（2026-02-12）
+
+### 8.1 Sitemap 优先级（更新）
+
+| 优先级 | 路径簇 | 目标 |
+|------|------|------|
+| P0 | `/`, `/signup`, `/app`, `/app/ask`, `/app/dashboards` | 激活转化 |
+| P1 | `/docs`, `/blog`, `/compare/*`, `/templates/*` | 长尾流量与替代词覆盖 |
+| P2 | `/open-source`, `/github`, `/security`, `/pricing` | 信任构建与品牌转化 |
+
+### 8.2 关键词簇（更新）
+
+| 簇 | 关键词示例 | 意图 |
+|------|------|------|
+| A（产品词） | AI 数据分析、自然语言 SQL、AI analytics platform | 产品认知 |
+| B（替代词） | PostHog 替代、Amplitude alternative、开源埋点平台 | 竞品替换 |
+| C（场景词） | 增长分析、留存分析、funnel analytics | 业务场景转化 |
+
+### 8.3 Council 决策（SEO 维度）
+
+1. 先做产品页权重建设，再扩内容页规模。
+2. 博客选题优先“替代词 + 场景词”，避免泛化流量。
+3. 与 PRD/UX Map 对齐，确保 SEO 导流页面与产品激活链路一致。
+
+### 8.4 证据
+
+- `outputs/sop-multi-role-brainstorm/1-3-670e1dcd/reports/multi_role_brainstorm_report.md`
+- `doc/00_project/initiative_data-wings/ADR-2026-02-12-multi-role-brainstorm.md`
+
+---
+
 ## 附录
 
 ### A. 关键词追踪工具

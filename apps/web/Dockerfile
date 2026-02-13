@@ -3,6 +3,12 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Build-time public envs for Next.js client bundle.
+ARG NEXT_PUBLIC_API_URL=http://localhost:8080
+ARG NEXT_PUBLIC_AI_URL=http://localhost:8001
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_AI_URL=${NEXT_PUBLIC_AI_URL}
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
@@ -26,6 +32,10 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
+# Runtime-stage build args (for stable env expansion in this stage)
+ARG NEXT_PUBLIC_API_URL=http://localhost:8080
+ARG NEXT_PUBLIC_AI_URL=http://localhost:8001
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
@@ -43,10 +53,12 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_AI_URL=${NEXT_PUBLIC_AI_URL}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
 # Run server
 CMD ["node", "server.js"]

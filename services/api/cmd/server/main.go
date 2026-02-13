@@ -13,10 +13,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/MARUCIE/data-wings/services/api/internal/config"
 	"github.com/MARUCIE/data-wings/services/api/internal/auth"
+	"github.com/MARUCIE/data-wings/services/api/internal/config"
 	"github.com/MARUCIE/data-wings/services/api/internal/handlers"
 	"github.com/MARUCIE/data-wings/services/api/internal/repository"
+	"github.com/MARUCIE/data-wings/services/api/internal/response"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -57,9 +58,9 @@ func main() {
 	var eventHandler *handlers.EventHandler
 	var analyticsHandler *handlers.AnalyticsHandler
 
-	repo, err := repository.NewClickHouseRepository(cfg)
+	repo, err := initClickHouseRepository(cfg)
 	if err != nil {
-		log.Printf("WARNING: Failed to connect to ClickHouse: %v", err)
+		log.Printf("WARNING: %v", err)
 		log.Printf("Running in degraded mode - database operations will fail")
 	} else {
 		defer repo.Close()
@@ -163,12 +164,41 @@ func main() {
 	log.Println("Server exiting")
 }
 
+func initClickHouseRepository(cfg *config.Config) (*repository.ClickHouseRepository, error) {
+	maxAttempts := cfg.ClickHouseConnectMaxAttempts
+	if maxAttempts < 1 {
+		maxAttempts = 1
+	}
+
+	retryDelay := time.Duration(cfg.ClickHouseConnectRetryDelaySecond) * time.Second
+	if retryDelay <= 0 {
+		retryDelay = 2 * time.Second
+	}
+
+	var lastErr error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		repo, err := repository.NewClickHouseRepository(cfg)
+		if err == nil {
+			if attempt > 1 {
+				log.Printf("Connected to ClickHouse on retry %d/%d", attempt, maxAttempts)
+			}
+			return repo, nil
+		}
+
+		lastErr = err
+		log.Printf("WARNING: ClickHouse connect attempt %d/%d failed: %v", attempt, maxAttempts, err)
+		if attempt < maxAttempts {
+			time.Sleep(retryDelay)
+		}
+	}
+
+	return nil, fmt.Errorf("failed to connect to ClickHouse after %d attempts: %w", maxAttempts, lastErr)
+}
+
 // degradedHandler returns a handler for when the database is unavailable.
 func degradedHandler(endpoint string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"status":   "error",
-			"message":  "Database unavailable",
+		response.ErrorWithCode(c, http.StatusServiceUnavailable, "DATABASE_UNAVAILABLE", "Database unavailable", gin.H{
 			"endpoint": endpoint,
 		})
 	}

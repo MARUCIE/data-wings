@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "generated_at": "2026-02-13",
+  "allowed_lockfile_hosts": [
+    "registry.npmjs.org"
+  ],
+  "allowed_pnpm_advisories_high_or_critical": {
+    "1109842": {
+      "module": "glob",
+      "severity": "high",
+      "ghsa": "GHSA-5j98-mcp5-4vw2",
+      "reason": "Vulnerability applies to glob CLI (-c/--cmd with shell:true). Data Wings does not use glob CLI in production runtime; glob is a transitive dependency of eslint-config-next. Keep as known risk until eslint-config-next upgrades transitive glob.",
+      "expires_on": "2026-04-30",
+      "mitigation": "Do not invoke glob CLI on untrusted filenames in CI/dev scripts."
+    },
+    "1112653": {
+      "module": "next",
+      "severity": "high",
+      "ghsa": "GHSA-h25m-26qc-wcjf",
+      "reason": "Next.js 14.x advisory (DoS via request deserialization). Upgrade path requires Next >= 15.0.8; treat as known risk for local/dev while keeping Release gate on docker-only environments and restricting public exposure.",
+      "expires_on": "2026-03-31",
+      "mitigation": "If self-hosted publicly: apply rate limiting/WAF on server actions endpoints; plan Next upgrade."
+    }
+  }
+}

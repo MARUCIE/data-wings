@@ -136,11 +136,66 @@ jobs:
           files: services/ai/coverage.xml
           fail_ci_if_error: false
 
+  # Supply chain security gate
+  supply-chain:
+    name: Supply Chain Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: pnpm audit (json)
+        run: |
+          pnpm audit --json > pnpm-audit.json || true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: pip-audit (json)
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+          pip-audit -r services/ai/requirements.txt -f json > pip-audit.json || true
+
+      - name: Supply chain gate
+        run: |
+          python scripts/supply_chain_gate.py             --pnpm pnpm-audit.json             --pip pip-audit.json             --allowlist security/supply_chain_allowlist.json
+  # Postmortem trigger scan gate
+  postmortem-scan:
+    name: Postmortem Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run postmortem scan
+        run: |
+          BASE_SHA='${{ github.event.pull_request.base.sha || github.event.before }}'
+          HEAD_SHA='${{ github.sha }}'
+          python scripts/postmortem_scan.py --base "$BASE_SHA" --head "$HEAD_SHA" --out postmortem-scan.json
   # Build all packages
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [lint, test-js, test-go, test-python]
+    needs: [lint, test-js, test-go, test-python, supply-chain, postmortem-scan]
     steps:
       - uses: actions/checkout@v4
 

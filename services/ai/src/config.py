@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     clickhouse_database: str = "data_wings"
 
     # Redis Configuration
-    redis_url: str = "redis://localhost:6379/0"
+    redis_url: str = "redis://localhost:6309/0"
 
     # CORS Configuration
     cors_origins: list[str] = ["http://localhost:3000"]

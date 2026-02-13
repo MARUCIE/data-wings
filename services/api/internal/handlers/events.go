@@ -6,6 +6,7 @@ import (
 
 	"github.com/MARUCIE/data-wings/services/api/internal/models"
 	"github.com/MARUCIE/data-wings/services/api/internal/repository"
+	"github.com/MARUCIE/data-wings/services/api/internal/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,35 +25,28 @@ func NewEventHandler(repo *repository.ClickHouseRepository) *EventHandler {
 func (h *EventHandler) Track(c *gin.Context) {
 	var req models.TrackRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "EVENT_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
 	event, err := repository.ConvertTrackRequestToEvent(&req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Failed to process event",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusInternalServerError, "EVENT_PROCESSING_FAILED", "Failed to process event", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if err := h.repo.InsertEvent(c.Request.Context(), event); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Failed to store event",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusInternalServerError, "EVENT_STORE_FAILED", "Failed to store event", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":   "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"message":  "Event tracked",
 		"event_id": event.EventID.String(),
 	})
@@ -63,19 +57,14 @@ func (h *EventHandler) Track(c *gin.Context) {
 func (h *EventHandler) Batch(c *gin.Context) {
 	var req models.BatchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "EVENT_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if len(req.Events) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "No events provided",
-		})
+		response.ErrorWithCode(c, http.StatusBadRequest, "EVENT_BATCH_EMPTY", "No events provided", nil)
 		return
 	}
 
@@ -90,24 +79,18 @@ func (h *EventHandler) Batch(c *gin.Context) {
 	}
 
 	if len(events) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "No valid events to process",
-		})
+		response.ErrorWithCode(c, http.StatusBadRequest, "EVENT_BATCH_NO_VALID_EVENTS", "No valid events to process", nil)
 		return
 	}
 
 	if err := h.repo.InsertEventsBatch(c.Request.Context(), events); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Failed to store events",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusInternalServerError, "EVENT_BATCH_STORE_FAILED", "Failed to store events", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":   "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"message":  "Batch processed",
 		"received": len(req.Events),
 		"stored":   len(events),
@@ -119,10 +102,8 @@ func (h *EventHandler) Batch(c *gin.Context) {
 func (h *EventHandler) Identify(c *gin.Context) {
 	var req models.IdentifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "error",
-			"message": "Invalid request body",
-			"error":   err.Error(),
+		response.ErrorWithCode(c, http.StatusBadRequest, "EVENT_INVALID_REQUEST_BODY", "Invalid request body", gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -140,8 +121,7 @@ func (h *EventHandler) Identify(c *gin.Context) {
 		_ = h.repo.InsertEvent(c.Request.Context(), event)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "ok",
+	response.OK(c, http.StatusOK, gin.H{
 		"message": "User identified",
 		"user_id": req.UserID,
 	})

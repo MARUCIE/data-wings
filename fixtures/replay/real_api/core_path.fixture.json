@@ -1,0 +1,91 @@
+{
+  "name": "real_api_core_path",
+  "version": 1,
+  "default_headers": {
+    "Content-Type": "application/json"
+  },
+  "variables": {
+    "ROLE": "admin",
+    "QUESTION": "过去7天有哪些事件类型？"
+  },
+  "steps": [
+    {
+      "name": "signup",
+      "method": "POST",
+      "path": "/api/v1/auth/signup",
+      "body": {
+        "email": "{{EMAIL}}",
+        "password": "{{PASSWORD}}",
+        "role": "{{ROLE}}"
+      },
+      "expect_status": [201],
+      "extract": {
+        "TOKEN": "token",
+        "USER_ID": "user.id"
+      }
+    },
+    {
+      "name": "login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "body": {
+        "email": "{{EMAIL}}",
+        "password": "{{PASSWORD}}"
+      },
+      "expect_status": [200],
+      "extract": {
+        "TOKEN": "token",
+        "USER_ID": "user.id"
+      }
+    },
+    {
+      "name": "me",
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "auth": "bearer",
+      "expect_status": [200]
+    },
+    {
+      "name": "track_event",
+      "method": "POST",
+      "path": "/api/v1/track",
+      "body": {
+        "event_name": "fixture_core_path_event",
+        "anonymous_id": "{{ANON_ID}}",
+        "user_id": "{{USER_ID}}",
+        "properties": {
+          "source": "real_api_fixture",
+          "scenario": "core_path"
+        }
+      },
+      "expect_status": [200]
+    },
+    {
+      "name": "overview",
+      "method": "GET",
+      "path": "/api/v1/overview",
+      "auth": "bearer",
+      "expect_status": [200]
+    },
+    {
+      "name": "ask",
+      "method": "POST",
+      "path": "/api/v1/ask",
+      "auth": "bearer",
+      "body": {
+        "question": "{{QUESTION}}",
+        "context": {
+          "source": "real_api_fixture"
+        }
+      },
+      "expect_status": [200, 503]
+    },
+    {
+      "name": "dashboards",
+      "method": "GET",
+      "path": "/api/v1/dashboards",
+      "auth": "bearer",
+      "expect_status": [200]
+    }
+  ]
+}
